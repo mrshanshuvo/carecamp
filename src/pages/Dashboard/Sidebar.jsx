@@ -1,11 +1,8 @@
-import { NavLink } from 'react-router';
+import { NavLink, useNavigate } from 'react-router';
 import {
-  Home,
   LayoutDashboard,
   PlusCircle,
-  Settings,
   ClipboardList,
-  MessageSquare,
   User,
   CalendarCheck,
   ChartBar,
@@ -13,226 +10,183 @@ import {
   User2,
   Menu,
   X,
+  ChevronRight,
+  LogOut,
 } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import useUserRole from '../../hooks/useUserRole';
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+import CareCampLogo from '../Shared/CareCampLogo/CareCampLogo';
 
 const Sidebar = () => {
-  const { user } = useAuth();
+  const { logOut } = useAuth();
   const { role } = useUserRole();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const navigate = useNavigate();
   const isOrganizer = role === 'organizer';
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Common links for both roles
-  const commonLinks = [
-    { to: '/', label: 'Home', icon: <Home size={18} /> },
+  const handleLogout = async () => {
+    try {
+      await logOut();
+      toast.success('Logged out successfully');
+      navigate('/');
+    } catch {
+      toast.error('Failed to log out');
+    }
+  };
+
+  const navSections = [
     {
-      to: '/dashboard',
-      label: 'Dashboard',
-      icon: <LayoutDashboard size={18} />,
+      title: 'General',
+      items: [
+        { to: '/dashboard', label: 'Overview', icon: <LayoutDashboard size={16} />, end: true },
+      ],
+    },
+    {
+      title: isOrganizer ? 'Camp Management' : 'My Activity',
+      items: isOrganizer
+        ? [
+            { to: '/dashboard/add-camp', label: 'Add New Camp', icon: <PlusCircle size={16} /> },
+            {
+              to: '/dashboard/manage-camps',
+              label: 'Manage Camps',
+              icon: <ClipboardList size={16} />,
+            },
+            {
+              to: '/dashboard/manage-registered-camps',
+              label: 'Registrations',
+              icon: <CalendarCheck size={16} />,
+            },
+          ]
+        : [
+            { to: '/dashboard/analytics', label: 'Analytics', icon: <ChartBar size={16} /> },
+            {
+              to: '/dashboard/registered-camps',
+              label: 'My Camps',
+              icon: <ClipboardList size={16} />,
+            },
+            { to: '/dashboard/payment-history', label: 'Payments', icon: <CreditCard size={16} /> },
+          ],
+    },
+    {
+      title: 'Account',
+      items: [
+        {
+          to: isOrganizer ? '/dashboard/organizer-profile' : '/dashboard/participant-profile',
+          label: 'My Profile',
+          icon: isOrganizer ? <User2 size={16} /> : <User size={16} />,
+        },
+      ],
     },
   ];
-
-  // Organizer-specific links
-  const organizerLinks = [
-    {
-      to: '/dashboard/add-camp',
-      label: 'Add New Camp',
-      icon: <PlusCircle size={18} />,
-    },
-    {
-      to: '/dashboard/organizer-profile',
-      label: 'Organizer Profile',
-      icon: <User2 size={18} />,
-    },
-    {
-      to: '/dashboard/organizer-analytics',
-      label: 'Analytics & Reports',
-      icon: <ChartBar size={18} />,
-    },
-    {
-      to: '/dashboard/manage-camps',
-      label: 'Manage Camps',
-      icon: <Settings size={18} />,
-    },
-    {
-      to: '/dashboard/manage-registrations',
-      label: 'Manage Registrations',
-      icon: <ClipboardList size={18} />,
-    },
-  ];
-
-  // Participant-specific links
-  const participantLinks = [
-    {
-      to: '/dashboard/analytics',
-      label: 'Analytics',
-      icon: <ChartBar size={18} />,
-    },
-    {
-      to: '/dashboard/profile',
-      label: 'Participant Profile',
-      icon: <User size={18} />,
-    },
-    {
-      to: '/dashboard/registered-camps',
-      label: 'Registered Camps',
-      icon: <CalendarCheck size={18} />,
-    },
-    {
-      to: '/dashboard/payment-history',
-      label: 'Payment History',
-      icon: <CreditCard size={18} />,
-    },
-  ];
-
-  // Combine links based on role
-  const links = [...commonLinks, ...(isOrganizer ? organizerLinks : participantLinks)];
 
   return (
     <>
-      {/* Mobile menu button */}
+      {/* Mobile toggle */}
       {!isMobileMenuOpen && (
         <button
-          className="fixed top-4 left-4 z-50 lg:hidden p-2 rounded-md bg-gradient-to-r from-[#1e3a8a] to-[#0f766e] text-white shadow-lg"
+          className="fixed top-4 left-4 z-50 lg:hidden p-2.5 rounded-xl bg-[#495E57] dark:bg-slate-900 text-white shadow-lg border border-white/10 dark:border-slate-800"
           onClick={() => setIsMobileMenuOpen(true)}
+          aria-label="Open menu"
         >
-          <Menu size={24} />
+          <Menu size={20} />
         </button>
       )}
 
-      {/* Overlay for mobile */}
+      {/* Backdrop */}
       {isMobileMenuOpen && isMobile && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-40 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
-        ></div>
+        />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:relative z-40 w-64 min-h-screen bg-gradient-to-b from-[#1e3a8a] to-[#0f766e] text-white p-5 flex flex-col transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 z-40 w-64 h-screen flex flex-col bg-[#495E57] dark:bg-slate-900 border-r border-white/10 dark:border-slate-800 transition-transform duration-300 ease-in-out shadow-xl ${
           isMobile ? (isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0'
         }`}
       >
-        {/* Close button for mobile */}
+        {/* Mobile close */}
         {isMobile && (
           <button
-            className="absolute top-4 right-4 lg:hidden"
+            className="absolute top-4 right-4 p-1.5 text-slate-300 hover:text-white rounded-lg bg-white/10 lg:hidden"
             onClick={() => setIsMobileMenuOpen(false)}
           >
-            <X size={24} className="text-white/70 hover:text-white" />
+            <X size={18} />
           </button>
         )}
 
-        {/* Header with role badge */}
-        <div className="mb-8 pt-4">
-          <div
-            className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-3 ${
-              isOrganizer
-                ? 'bg-blue-100/10 backdrop-blur-sm border border-blue-300/20'
-                : 'bg-teal-100/10 backdrop-blur-sm border border-teal-300/20'
-            }`}
-          >
-            <div
-              className={`w-2 h-2 rounded-full mr-2 animate-pulse ${
-                isOrganizer ? 'bg-blue-400' : 'bg-teal-400'
-              }`}
-            ></div>
-            {isOrganizer ? 'Organizer Dashboard' : 'Participant Portal'}
-          </div>
-
-          <div className="flex items-center">
-            <div
-              className={`p-2 rounded-lg mr-3 ${
-                isOrganizer
-                  ? 'bg-blue-500/20 border border-blue-400/30'
-                  : 'bg-teal-500/20 border border-teal-400/30'
-              }`}
-            >
-              {isOrganizer ? (
-                <Settings size={20} className="text-blue-300" />
-              ) : (
-                <User size={20} className="text-teal-300" />
-              )}
-            </div>
-            <h2 className="text-xl sm:text-2xl font-bold">
-              <span className="bg-gradient-to-r from-blue-300 to-teal-300 bg-clip-text text-transparent">
-                {user?.displayName || 'User'}
-              </span>
-            </h2>
-          </div>
+        {/* Top: Logo area */}
+        <div className="px-5 pt-5 pb-4 border-b border-white/10 dark:border-slate-800">
+          <CareCampLogo />
+          <p className="text-[10px] text-slate-300/60 font-medium mt-2 pl-0.5">
+            {isOrganizer ? 'Organizer Portal' : 'Participant Portal'}
+          </p>
         </div>
 
-        {/* Navigation links */}
-        <nav className="space-y-2 flex-1 overflow-y-auto">
-          {links.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              className={({ isActive }) =>
-                `flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 group ${
-                  isActive
-                    ? isOrganizer
-                      ? 'bg-blue-500/10 backdrop-blur-sm border border-blue-400/20 shadow-lg'
-                      : 'bg-teal-500/10 backdrop-blur-sm border border-teal-400/20 shadow-lg'
-                    : 'hover:bg-white/5 hover:border-white/10 hover:shadow-md'
-                }`
-              }
-              onClick={() => isMobile && setIsMobileMenuOpen(false)}
-            >
-              {({ isActive }) => (
-                <>
-                  <span
-                    className={`mr-3 ${
-                      isActive ? (isOrganizer ? 'text-blue-300' : 'text-teal-300') : 'text-gray-300'
-                    }`}
+        {/* Nav */}
+        <nav className="flex-1 overflow-y-auto px-3 pb-3 space-y-5">
+          {navSections.map((section) => (
+            <div key={section.title}>
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/35 dark:text-slate-500 px-2 mb-1.5">
+                {section.title}
+              </p>
+              <div className="space-y-0.5">
+                {section.items.map((link) => (
+                  <NavLink
+                    key={link.to}
+                    to={link.to}
+                    end={link.end ?? false}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 group ${
+                        isActive
+                          ? 'bg-white/15 dark:bg-slate-800 text-white border border-white/15 dark:border-slate-700'
+                          : 'text-slate-300 dark:text-slate-400 hover:bg-white/8 dark:hover:bg-slate-800/50 hover:text-white dark:hover:text-slate-200'
+                      }`
+                    }
+                    onClick={() => isMobile && setIsMobileMenuOpen(false)}
                   >
-                    {link.icon}
-                  </span>
-                  <span className="truncate">{link.label}</span>
-                  <span className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className={`h-4 w-4 ${isOrganizer ? 'text-blue-300/50' : 'text-teal-300/50'}`}
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </span>
-                </>
-              )}
-            </NavLink>
+                    {({ isActive }) => (
+                      <>
+                        <span
+                          className={
+                            isActive
+                              ? 'text-[#F4CE14]'
+                              : 'text-slate-400 dark:text-slate-500 group-hover:text-white/80'
+                          }
+                        >
+                          {link.icon}
+                        </span>
+                        <span className="flex-1 truncate">{link.label}</span>
+                        {isActive && <ChevronRight size={12} className="text-[#F4CE14] shrink-0" />}
+                      </>
+                    )}
+                  </NavLink>
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
 
         {/* Footer */}
-        <div
-          className={`mt-auto pt-4 border-t ${
-            isOrganizer ? 'border-blue-400/10' : 'border-teal-400/10'
-          } text-xs text-white/50`}
-        >
-          <p>CareCamp v4.0.0</p>
-          <p>Logged in as: {isOrganizer ? 'Organizer' : 'Participant'}</p>
+        <div className="px-3 pb-4 pt-3 border-t border-white/10 dark:border-slate-800">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/15 transition-all cursor-pointer"
+          >
+            <LogOut size={15} />
+            <span>Sign Out</span>
+          </button>
         </div>
       </aside>
     </>

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { Loader2, AlertCircle, CheckCircle } from 'lucide-react';
+import { Loader2, AlertCircle, CheckCircle, CreditCard, X } from 'lucide-react';
 import useAxiosSecure from '../../../../hooks/useAxiosSecure';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 const PaymentDialog = ({ open, onClose, camp, registration, onPaymentSuccess }) => {
   const stripe = useStripe();
@@ -26,7 +28,7 @@ const PaymentDialog = ({ open, onClose, camp, registration, onPaymentSuccess }) 
 
       const clientSecret = response.data.data?.clientSecret ?? response.data.clientSecret;
 
-      // ✅ Handle free camp (no payment intent needed)
+      // Handle free camp
       if (!clientSecret) {
         await axiosSecure.post('/payments', {
           campId: camp._id,
@@ -74,92 +76,111 @@ const PaymentDialog = ({ open, onClose, camp, registration, onPaymentSuccess }) 
 
   if (paymentIntent?.status === 'succeeded') {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div
-          className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
-          onClick={onClose}
-        ></div>
-        <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-6">
-          <div className="text-center">
-            <CheckCircle className="mx-auto h-12 w-12 text-green-500 mb-4" />
-            <h3 className="text-xl font-bold mb-2">Payment Successful!</h3>
-            <p className="mb-4">Thank you for your payment.</p>
-            <div className="bg-gray-100 p-4 rounded-lg mb-4">
-              <p className="font-mono text-sm break-all">Transaction ID: {paymentIntent.id}</p>
-            </div>
-            <button onClick={onClose} className="px-4 py-2 bg-blue-600 text-white rounded-lg">
-              Close
-            </button>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-md p-6 text-center space-y-4">
+          <CheckCircle className="mx-auto h-12 w-12 text-emerald-500" />
+          <h3 className="text-xl font-black text-slate-900 dark:text-slate-100">
+            Payment Successful!
+          </h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Thank you for completing your medical camp registration payment.
+          </p>
+          <div className="bg-slate-50 dark:bg-slate-950 p-3 rounded-xl border border-slate-200/60 dark:border-slate-800">
+            <p className="font-mono text-xs text-slate-700 dark:text-slate-300 break-all">
+              TxID: {paymentIntent.id}
+            </p>
           </div>
+          <Button
+            onClick={onClose}
+            className="w-full bg-[#495E57] dark:bg-[#F4CE14] text-white dark:text-slate-950 font-bold text-xs py-2.5 rounded-xl border-none"
+          >
+            Done
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
-        onClick={onClose}
-      ></div>
-      <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-6">
-        <div className="bg-gradient-to-r from-[#1e3a8a] to-[#0f766e] p-6 text-white rounded-t-3xl -m-6 mb-6">
-          <h3 className="text-xl font-bold">Pay for {camp?.name}</h3>
-        </div>
-
-        <div className="flex items-center justify-between mb-6">
-          <span className="text-gray-600">Amount Due:</span>
-          <span className="text-2xl font-bold">${camp?.fees}</span>
-        </div>
-
-        {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-6">
-            <div className="flex items-center">
-              <AlertCircle className="h-5 w-5 text-red-500 mr-3" />
-              <p className="text-red-700">{error}</p>
-            </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
+      <div className="relative bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-md overflow-hidden">
+        {/* Header */}
+        <div className="bg-[#495E57] dark:bg-slate-950 p-6 text-white flex items-center justify-between">
+          <div>
+            <Badge className="bg-white/15 text-white border border-white/20 text-[10px] font-bold mb-1">
+              Secure Stripe Checkout
+            </Badge>
+            <h3 className="text-base font-bold truncate max-w-[280px]">{camp?.name}</h3>
           </div>
-        )}
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 text-slate-300 hover:text-white rounded-lg bg-white/10"
+          >
+            <X size={18} />
+          </button>
+        </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="border border-gray-200 rounded-xl p-4 mb-6">
-            <CardElement
-              options={{
-                style: {
-                  base: {
-                    fontSize: '16px',
-                    color: '#424770',
-                    '::placeholder': {
-                      color: '#aab7c4',
+        <div className="p-6 space-y-6">
+          <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200/60 dark:border-slate-800">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+              Total Amount Due:
+            </span>
+            <span className="text-2xl font-black text-slate-900 dark:text-slate-100">
+              ${camp?.fees}
+            </span>
+          </div>
+
+          {error && (
+            <div className="bg-rose-500/10 border border-rose-500/20 p-3.5 rounded-xl flex items-center gap-2 text-xs text-rose-600 dark:text-rose-400 font-medium">
+              <AlertCircle size={16} className="shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-4 bg-slate-50 dark:bg-slate-950">
+              <CardElement
+                options={{
+                  style: {
+                    base: {
+                      fontSize: '14px',
+                      color: '#0f172a',
+                      '::placeholder': {
+                        color: '#94a3b8',
+                      },
                     },
                   },
-                },
-              }}
-            />
-          </div>
+                }}
+              />
+            </div>
 
-          <div className="flex justify-end space-x-3">
-            <button type="button" onClick={onClose} className="px-4 py-2 border rounded-lg">
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={!stripe || isProcessing}
-              className={`px-4 py-2 rounded-lg text-white font-medium ${
-                isProcessing ? 'bg-blue-400' : 'bg-gradient-to-r from-blue-600 to-purple-600'
-              }`}
-            >
-              {isProcessing ? (
-                <span className="flex items-center justify-center">
-                  <Loader2 className="animate-spin mr-2" size={18} />
-                  Processing...
-                </span>
-              ) : (
-                `Pay $${camp?.fees}`
-              )}
-            </button>
-          </div>
-        </form>
+            <div className="flex justify-end gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                className="flex-1 font-bold text-xs py-2.5 h-auto rounded-xl border-slate-200 dark:border-slate-800"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={!stripe || isProcessing}
+                className="flex-1 bg-[#495E57] dark:bg-[#F4CE14] text-white dark:text-slate-950 font-bold text-xs py-2.5 h-auto rounded-xl border-none cursor-pointer"
+              >
+                {isProcessing ? (
+                  <span className="flex items-center justify-center gap-1.5">
+                    <Loader2 className="animate-spin" size={14} />
+                    <span>Processing...</span>
+                  </span>
+                ) : (
+                  `Pay $${camp?.fees}`
+                )}
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

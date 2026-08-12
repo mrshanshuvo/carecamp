@@ -116,7 +116,7 @@ const PopularCampsSection = () => {
                   {/* Card Media Header */}
                   <div className="relative w-full h-52 overflow-hidden bg-slate-950">
                     <img
-                      src={camp.imageURL || getFallbackImage(camp.name)}
+                      src={camp.imageURL || camp.image || getFallbackImage(camp.name)}
                       alt={camp.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                       onError={(e) => {

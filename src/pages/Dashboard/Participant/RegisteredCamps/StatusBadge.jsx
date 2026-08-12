@@ -1,27 +1,28 @@
 import { CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 const StatusBadge = ({ status }) => {
   switch (status) {
     case 'Paid':
       return (
-        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-          <CheckCircle className="mr-1 h-3 w-3" />
+        <Badge className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+          <CheckCircle size={12} />
           Paid
-        </span>
+        </Badge>
       );
     case 'Pending':
       return (
-        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-          <Clock className="mr-1 h-3 w-3" />
+        <Badge className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+          <Clock size={12} />
           Pending
-        </span>
+        </Badge>
       );
     default:
       return (
-        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-          <AlertCircle className="mr-1 h-3 w-3" />
+        <Badge className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+          <AlertCircle size={12} />
           Unpaid
-        </span>
+        </Badge>
       );
   }
 };

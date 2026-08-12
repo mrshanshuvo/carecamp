@@ -44,27 +44,6 @@ const STATS = [
 ];
 
 const AboutUs = () => {
-  const HeaderSection = useMemo(
-    () => (
-      <div className="text-center mb-12">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-full border border-slate-200/80 dark:border-slate-800 shadow-xs mb-4">
-          <HeartPulse size={16} className="text-[#495E57] dark:text-[#F4CE14]" />
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
-            About Our Platform
-          </span>
-        </div>
-        <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-slate-100 mb-4 tracking-tight">
-          Medical Camp Management System{' '}
-          <span className="text-[#495E57] dark:text-[#F4CE14] block sm:inline">(CareCamp)</span>
-        </h1>
-        <p className="text-base sm:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto leading-relaxed">
-          Revolutionizing how medical camps are organized and accessed across Bangladesh.
-        </p>
-      </div>
-    ),
-    []
-  );
-
   const MainContent = useMemo(
     () => (
       <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm overflow-hidden border border-slate-200/80 dark:border-slate-800 transition-colors">
@@ -181,7 +160,6 @@ const AboutUs = () => {
       aria-label="About CareCamp"
     >
       <div className="max-w-6xl mx-auto">
-        {HeaderSection}
         {MainContent}
         {StatsSection}
       </div>

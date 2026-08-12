@@ -19,7 +19,7 @@ const useUserRole = () => {
     enabled: !!user?.email,
   });
 
-  const role = roleData?.role || 'participant';
+  const role = roleData?.data?.role || roleData?.role || 'participant';
 
   return { role, roleLoading: authLoading || roleLoading, error };
 };

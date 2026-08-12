@@ -12,18 +12,21 @@ import {
   ChevronRight,
   ArrowRight,
   Search,
-  Filter,
-  Download,
+  Receipt,
 } from 'lucide-react';
 import useAuth from '../../../hooks/useAuth';
 import useAxios from '../../../hooks/useAxios';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
+import { Card, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 
 const statusStyles = {
-  completed: 'bg-green-100 text-green-800',
-  pending: 'bg-yellow-100 text-yellow-800',
-  failed: 'bg-red-100 text-red-800',
-  refunded: 'bg-blue-100 text-blue-800',
+  completed: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+  pending: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+  failed: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
+  refunded: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
 };
 
 const CampInfo = ({ campId }) => {
@@ -40,20 +43,20 @@ const CampInfo = ({ campId }) => {
   if (isLoading) {
     return (
       <div className="flex items-center space-x-3">
-        <div className="w-12 h-12 rounded-full bg-gray-200 animate-pulse"></div>
-        <div className="space-y-2">
-          <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
-          <div className="h-3 w-24 bg-gray-200 rounded animate-pulse"></div>
+        <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-800 animate-pulse" />
+        <div className="space-y-1.5">
+          <div className="h-3.5 w-28 bg-slate-200 dark:bg-slate-800 rounded animate-pulse" />
+          <div className="h-3 w-20 bg-slate-200 dark:bg-slate-800 rounded animate-pulse" />
         </div>
       </div>
     );
   }
 
-  if (!camp) return <span className="text-gray-500">Unknown Camp</span>;
+  if (!camp) return <span className="text-xs text-slate-400">Unknown Camp</span>;
 
   return (
     <div className="flex items-center space-x-3">
-      <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm">
+      <div className="w-10 h-10 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 bg-slate-100 dark:bg-slate-800">
         <img
           src={camp.imageURL || '/default-camp.png'}
           alt={camp.name}
@@ -63,9 +66,11 @@ const CampInfo = ({ campId }) => {
           }}
         />
       </div>
-      <div>
-        <h4 className="font-medium text-gray-900">{camp.name}</h4>
-        <p className="text-sm text-gray-500">{camp.location}</p>
+      <div className="min-w-0">
+        <h4 className="font-bold text-xs text-slate-900 dark:text-slate-100 truncate">
+          {camp.name}
+        </h4>
+        <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{camp.location}</p>
       </div>
     </div>
   );
@@ -95,240 +100,257 @@ const PaymentHistory = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    setPage(1); // Reset to first page on new search
+    setPage(1);
   };
 
   const getStatusBadge = (status) => {
     const statusKey = status?.toLowerCase() || 'unknown';
     return (
-      <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          statusStyles[statusKey] || 'bg-gray-100 text-gray-800'
+      <Badge
+        className={`inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
+          statusStyles[statusKey] ||
+          'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
         }`}
       >
-        {statusKey === 'completed' && <CheckCircle className="mr-1 h-3 w-3" />}
-        {statusKey === 'pending' && <Clock className="mr-1 h-3 w-3" />}
-        {statusKey === 'failed' && <AlertCircle className="mr-1 h-3 w-3" />}
-        {status}
-      </span>
+        {statusKey === 'completed' && <CheckCircle size={12} />}
+        {statusKey === 'pending' && <Clock size={12} />}
+        {statusKey === 'failed' && <AlertCircle size={12} />}
+        <span className="capitalize">{status}</span>
+      </Badge>
     );
   };
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <Loader2 className="animate-spin h-12 w-12 text-blue-600 mb-4" />
-        <p className="text-gray-600">Loading payment history...</p>
+      <div className="flex flex-col items-center justify-center py-20 space-y-3 min-h-[60vh]">
+        <Loader2 className="animate-spin h-10 w-10 text-[#495E57] dark:text-[#F4CE14]" />
+        <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
+          Loading Payment History...
+        </p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg my-6">
-        <div className="flex items-center">
-          <AlertCircle className="h-5 w-5 text-red-500 mr-3" />
-          <div>
-            <h3 className="text-sm font-medium text-red-800">Error loading payment history</h3>
-            <p className="text-sm text-red-700 mt-1">{error.message || 'Please try again later'}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-2 text-sm text-red-600 hover:underline"
-            >
-              Refresh page
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (payments.length === 0) {
-    return (
-      <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8 text-center my-8">
-        <CreditCard className="mx-auto h-12 w-12 text-blue-400 mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-1">No payment history found</h3>
-        <p className="text-gray-500 mb-4">
-          Your payment records will appear here once you register for a medical camp
-        </p>
-        <a
-          href="/available-camps"
-          className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg transition-all"
-        >
-          Browse Available Camps
-          <ArrowRight className="ml-2 h-4 w-4" />
-        </a>
+      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+        <Card className="bg-red-500/10 border border-red-500/20 p-6 rounded-3xl text-center space-y-3">
+          <AlertCircle className="mx-auto h-8 w-8 text-red-500" />
+          <CardTitle className="text-sm font-bold text-red-600 dark:text-red-400">
+            Error Loading Payment History
+          </CardTitle>
+          <CardDescription className="text-xs text-red-700 dark:text-red-300">
+            {error.message || 'Please try again later'}
+          </CardDescription>
+          <Button
+            onClick={() => window.location.reload()}
+            className="bg-red-600 text-white font-bold text-xs px-4 py-2 h-auto rounded-xl"
+          >
+            Refresh Page
+          </Button>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-[#1e3a8a] to-[#0f766e] p-6 text-white">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-xl font-bold flex items-center mb-4 sm:mb-0">
-            <CreditCard className="mr-3" size={24} />
-            Payment History
-          </h2>
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
+      {/* Table Card */}
+      <Card className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-200/80 dark:border-slate-800 overflow-hidden">
+        {/* Header Bar */}
+        <div className="bg-[#495E57] dark:bg-slate-950 p-6 text-white space-y-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="space-y-1">
+              <Badge className="bg-white/15 dark:bg-slate-800 text-white dark:text-[#F4CE14] border border-white/20 text-[10px] font-bold px-3 py-0.5 rounded-full">
+                Financial Transactions
+              </Badge>
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight flex items-center gap-2">
+                <Receipt className="text-[#F4CE14]" size={22} />
+                Payment Records
+              </h1>
+            </div>
 
-          <div className="flex flex-col sm:flex-row gap-3">
-            <form onSubmit={handleSearch} className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search transactions..."
-                className="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </form>
+            {/* Controls */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <form onSubmit={handleSearch} className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input
+                  type="text"
+                  placeholder="Search transactions..."
+                  className="pl-9 bg-white/10 dark:bg-slate-900 border-white/20 dark:border-slate-800 text-white placeholder:text-slate-300 text-xs rounded-xl h-9 min-w-[200px]"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </form>
 
-            <select
-              value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value);
-                setPage(1);
-              }}
-              className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900"
-            >
-              <option value="all">All Statuses</option>
-              <option value="completed">Completed</option>
-              <option value="pending">Pending</option>
-              <option value="failed">Failed</option>
-              <option value="refunded">Refunded</option>
-            </select>
+              <select
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                  setPage(1);
+                }}
+                className="px-3 py-1.5 rounded-xl border border-white/20 dark:border-slate-800 bg-white/10 dark:bg-slate-900 text-white text-xs font-bold focus:outline-none cursor-pointer"
+              >
+                <option value="all" className="text-slate-900">
+                  All Statuses
+                </option>
+                <option value="completed" className="text-slate-900">
+                  Completed
+                </option>
+                <option value="pending" className="text-slate-900">
+                  Pending
+                </option>
+                <option value="failed" className="text-slate-900">
+                  Failed
+                </option>
+                <option value="refunded" className="text-slate-900">
+                  Refunded
+                </option>
+              </select>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Camp
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Payment Date
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Amount
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Method
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Transaction ID
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Status
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {payments.map((payment) => (
-              <tr key={payment._id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <CampInfo campId={payment.campId} />
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {payment.paymentDate ? (
-                    <div className="flex items-center">
-                      <Calendar className="mr-2 h-4 w-4 text-gray-400" />
-                      <div>
-                        <div>{format(new Date(payment.paymentDate), 'MMM d, yyyy')}</div>
-                        <div className="text-xs text-gray-500">
-                          {format(new Date(payment.paymentDate), 'h:mm a')}
+        {/* Table Content */}
+        {payments.length === 0 ? (
+          <div className="p-12 text-center space-y-4">
+            <CreditCard className="mx-auto h-12 w-12 text-slate-400 dark:text-slate-600" />
+            <div>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                No Transactions Found
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
+                Your payment history will automatically appear here once you register for medical
+                camps.
+              </p>
+            </div>
+            <Button
+              onClick={() => (window.location.href = '/available-camps')}
+              className="bg-[#495E57] dark:bg-[#F4CE14] text-white dark:text-slate-950 font-bold text-xs px-5 py-2.5 h-auto rounded-xl inline-flex items-center gap-2"
+            >
+              <span>Browse Camps</span>
+              <ArrowRight size={14} />
+            </Button>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200/80 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+                <tr>
+                  <th className="px-6 py-3.5">Camp</th>
+                  <th className="px-6 py-3.5">Payment Date</th>
+                  <th className="px-6 py-3.5">Amount</th>
+                  <th className="px-6 py-3.5">Method</th>
+                  <th className="px-6 py-3.5">Transaction ID</th>
+                  <th className="px-6 py-3.5">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                {payments.map((payment) => (
+                  <tr
+                    key={payment._id}
+                    className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors"
+                  >
+                    <td className="px-6 py-4">
+                      <CampInfo campId={payment.campId} />
+                    </td>
+                    <td className="px-6 py-4">
+                      {payment.paymentDate ? (
+                        <div className="flex items-center gap-2">
+                          <Calendar size={14} className="text-slate-400 shrink-0" />
+                          <div>
+                            <div className="font-semibold text-slate-900 dark:text-slate-100">
+                              {format(new Date(payment.paymentDate), 'MMM d, yyyy')}
+                            </div>
+                            <div className="text-[10px] text-slate-400">
+                              {format(new Date(payment.paymentDate), 'h:mm a')}
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  ) : (
-                    'N/A'
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap font-medium">
-                  ${(payment.amount || 0).toFixed(2)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="capitalize">{payment.paymentMethod || 'stripe'}</span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
-                  {payment.transactionId?.slice(0, 6)}...
-                  {payment.transactionId?.slice(-4)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(payment.status)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                      ) : (
+                        'N/A'
+                      )}
+                    </td>
+                    <td className="px-6 py-4 font-bold text-slate-900 dark:text-slate-100">
+                      ${(payment.amount || 0).toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="capitalize font-semibold text-slate-600 dark:text-slate-400">
+                        {payment.paymentMethod || 'Stripe'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 font-mono text-[11px] text-slate-500 dark:text-slate-400">
+                      {payment.transactionId?.slice(0, 8)}...
+                      {payment.transactionId?.slice(-4)}
+                    </td>
+                    <td className="px-6 py-4">{getStatusBadge(payment.status)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-      {/* Pagination and Actions */}
-      <div className="bg-gray-50 px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between border-t border-gray-200">
-        <div className="flex items-center mb-4 sm:mb-0">
-          <button
-            onClick={() => setPage(1)}
-            disabled={page === 1}
-            className="px-3 py-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed mr-2"
-          >
-            First
-          </button>
-          <button
-            onClick={() => setPage((p) => Math.max(p - 1, 1))}
-            disabled={page === 1}
-            className="px-3 py-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-          >
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            Previous
-          </button>
-          <span className="mx-4 text-sm text-gray-700">
-            Page {pagination.page} of {pagination.totalPages}
-          </span>
-          <button
-            onClick={() => setPage((p) => Math.min(p + 1, pagination.totalPages))}
-            disabled={page === pagination.totalPages}
-            className="px-3 py-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-          >
-            Next
-            <ChevronRight className="h-4 w-4 ml-1" />
-          </button>
-          <button
-            onClick={() => setPage(pagination.totalPages)}
-            disabled={page === pagination.totalPages}
-            className="px-3 py-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed ml-2"
-          >
-            Last
-          </button>
-        </div>
+        {/* Footer & Pagination */}
+        {payments.length > 0 && (
+          <div className="bg-slate-50 dark:bg-slate-950 px-6 py-4 border-t border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2 text-xs">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setPage(1)}
+                disabled={page === 1}
+                className="h-8 text-xs font-bold rounded-lg border-slate-200 dark:border-slate-800"
+              >
+                First
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                disabled={page === 1}
+                className="h-8 text-xs font-bold rounded-lg border-slate-200 dark:border-slate-800 gap-1"
+              >
+                <ChevronLeft size={14} />
+                <span>Prev</span>
+              </Button>
+              <span className="px-3 text-slate-600 dark:text-slate-400 font-medium">
+                Page{' '}
+                <strong className="text-slate-900 dark:text-slate-100">
+                  {pagination.page || page}
+                </strong>{' '}
+                of{' '}
+                <strong className="text-slate-900 dark:text-slate-100">
+                  {pagination.totalPages || 1}
+                </strong>
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setPage((p) => Math.min(p + 1, pagination.totalPages))}
+                disabled={page === (pagination.totalPages || 1)}
+                className="h-8 text-xs font-bold rounded-lg border-slate-200 dark:border-slate-800 gap-1"
+              >
+                <span>Next</span>
+                <ChevronRight size={14} />
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setPage(pagination.totalPages || 1)}
+                disabled={page === (pagination.totalPages || 1)}
+                className="h-8 text-xs font-bold rounded-lg border-slate-200 dark:border-slate-800"
+              >
+                Last
+              </Button>
+            </div>
 
-        <div className="flex items-center space-x-3">
-          <span className="text-sm text-gray-500">{pagination.totalItems} transactions total</span>
-          <button className="flex items-center text-sm text-blue-600 hover:text-blue-800">
-            <Download className="h-4 w-4 mr-1" />
-            Export
-          </button>
-        </div>
-      </div>
+            <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-medium">
+              <span>{pagination.totalItems || payments.length} transactions total</span>
+            </div>
+          </div>
+        )}
+      </Card>
     </div>
   );
 };

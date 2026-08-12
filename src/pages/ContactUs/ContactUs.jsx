@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo, useCallback } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import emailjs from '@emailjs/browser';
 import toast, { Toaster } from 'react-hot-toast';
 import useAxios from '../../hooks/useAxios';
@@ -12,63 +12,43 @@ import {
   Twitter,
   Instagram,
   Linkedin,
-  Star,
+  MessageSquare,
 } from 'lucide-react';
 
-// Constants
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+
 const CONTACT_INFO = [
   {
-    icon: <Mail className="text-[#495E57]" size={20} />,
+    icon: <Mail className="text-[#495E57] dark:text-[#F4CE14]" size={20} />,
     title: 'Email',
-    value: 'support@CareCamp.com',
-    action: 'mailto:support@CareCamp.com',
+    value: 'support@carecamp.com',
+    action: 'mailto:support@carecamp.com',
     actionText: 'Send us an email',
-    bgColor: 'bg-[#495E57]/10',
   },
   {
-    icon: <Phone className="text-[#495E57]" size={20} />,
+    icon: <Phone className="text-[#495E57] dark:text-[#F4CE14]" size={20} />,
     title: 'Phone',
     value: '+880-1234-567890',
     action: 'tel:+8801234567890',
     actionText: 'Call us now',
-    bgColor: 'bg-[#495E57]/10',
   },
   {
-    icon: <MapPin className="text-[#495E57]" size={20} />,
+    icon: <MapPin className="text-[#495E57] dark:text-[#F4CE14]" size={20} />,
     title: 'Address',
     value: '123 Health St, Dhaka, Bangladesh',
     action: 'https://maps.google.com',
     actionText: 'View on map',
-    bgColor: 'bg-[#495E57]/10',
     fullWidth: true,
   },
 ];
 
 const SOCIAL_LINKS = [
-  {
-    icon: <Facebook size={20} />,
-    label: 'Facebook',
-    url: '#',
-    color: 'bg-[#495E57]/10 text-[#495E57] hover:bg-[#495E57]/20',
-  },
-  {
-    icon: <Twitter size={20} />,
-    label: 'Twitter',
-    url: '#',
-    color: 'bg-[#495E57]/10 text-[#495E57] hover:bg-[#495E57]/20',
-  },
-  {
-    icon: <Instagram size={20} />,
-    label: 'Instagram',
-    url: '#',
-    color: 'bg-[#495E57]/10 text-[#495E57] hover:bg-[#495E57]/20',
-  },
-  {
-    icon: <Linkedin size={20} />,
-    label: 'LinkedIn',
-    url: '#',
-    color: 'bg-[#495E57]/10 text-[#495E57] hover:bg-[#495E57]/20',
-  },
+  { icon: <Facebook size={18} />, label: 'Facebook', url: '#' },
+  { icon: <Twitter size={18} />, label: 'Twitter', url: '#' },
+  { icon: <Instagram size={18} />, label: 'Instagram', url: '#' },
+  { icon: <Linkedin size={18} />, label: 'LinkedIn', url: '#' },
 ];
 
 const ContactUs = () => {
@@ -76,51 +56,29 @@ const ContactUs = () => {
   const [loading, setLoading] = useState(false);
   const axiosInstance = useAxios();
 
-  // Environment variables with fallbacks
   const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
   const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
   const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-
-  // Memoized toast styles
-  const toastStyles = useMemo(
-    () => ({
-      success: {
-        style: {
-          background: '#10B981',
-          color: '#fff',
-        },
-      },
-      error: {
-        style: {
-          background: '#EF4444',
-          color: '#fff',
-        },
-      },
-    }),
-    []
-  );
 
   const sendEmail = useCallback(
     async (e) => {
       e.preventDefault();
       setLoading(true);
 
-      // Basic form validation
       const formData = new FormData(form.current);
       const name = formData.get('user_name');
       const email = formData.get('user_email');
       const message = formData.get('message');
 
       if (!name || !email || !message) {
-        toast.error('Please fill in all required fields.', toastStyles.error);
+        toast.error('Please fill in all required fields.');
         setLoading(false);
         return;
       }
 
-      // Email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        toast.error('Please enter a valid email address.', toastStyles.error);
+        toast.error('Please enter a valid email address.');
         setLoading(false);
         return;
       }
@@ -136,221 +94,183 @@ const ContactUs = () => {
           message,
         });
 
-        toast.success(
-          "Message sent successfully! We'll get back to you soon.",
-          toastStyles.success
-        );
+        toast.success("Message sent successfully! We'll get back to you soon.");
         form.current.reset();
       } catch {
-        toast.error(
-          'Failed to send message. Please try again or contact us directly.',
-          toastStyles.error
-        );
+        toast.error('Failed to send message. Please try again.');
       } finally {
         setLoading(false);
       }
     },
-    [SERVICE_ID, TEMPLATE_ID, PUBLIC_KEY, toastStyles, axiosInstance]
-  );
-
-  // Memoized components
-  const HeaderSection = useMemo(
-    () => (
-      <div className="text-center mb-12">
-        <div className="inline-flex items-center px-4 py-2 bg-[#495E57]/10 rounded-full text-[#495E57] font-medium mb-4">
-          <Star size={16} className="text-[#F4CE14] mr-2" fill="#F4CE14" />
-          Contact Support
-        </div>
-        <h1 className="text-4xl font-bold text-[#45474B] mb-4">
-          Get in
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#495E57] to-[#F4CE14]">
-            {' '}
-            Touch
-          </span>
-        </h1>
-        <p className="text-xl text-[#45474B]/70 max-w-3xl mx-auto leading-relaxed">
-          Have questions or feedback? We're here to help and would love to hear from you.
-        </p>
-      </div>
-    ),
-    []
-  );
-
-  const ContactForm = useMemo(
-    () => (
-      <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-[#495E57]/10">
-        <div className="p-8 sm:p-10">
-          <h2 className="text-2xl font-semibold text-[#45474B] mb-6">Send us a message</h2>
-          <form ref={form} onSubmit={sendEmail} className="space-y-5" noValidate>
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-[#45474B] mb-1">
-                Your Name *
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="user_name"
-                required
-                className="w-full px-4 py-3 border border-[#495E57]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#495E57] focus:border-transparent bg-white transition-colors duration-200"
-                placeholder="Elon Musk"
-                aria-required="true"
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-[#45474B] mb-1">
-                Email Address *
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="user_email"
-                required
-                className="w-full px-4 py-3 border border-[#495E57]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#495E57] focus:border-transparent bg-white transition-colors duration-200"
-                placeholder="you@example.com"
-                aria-required="true"
-              />
-            </div>
-            <div>
-              <label htmlFor="message" className="block text-sm font-medium text-[#45474B] mb-1">
-                Your Message *
-              </label>
-              <textarea
-                id="message"
-                name="message"
-                rows="5"
-                required
-                className="w-full px-4 py-3 border border-[#495E57]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#495E57] focus:border-transparent bg-white transition-colors duration-200 resize-vertical"
-                placeholder="How can we help you?"
-                aria-required="true"
-              ></textarea>
-            </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className={`w-full flex items-center justify-center px-6 py-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#495E57] focus:ring-offset-2 ${
-                loading
-                  ? 'bg-[#495E57]/50 text-white cursor-not-allowed'
-                  : 'bg-gradient-to-r from-[#495E57] to-[#495E57]/90 text-white hover:shadow-lg'
-              }`}
-              aria-label={loading ? 'Sending message...' : 'Send message'}
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="animate-spin mr-2" size={18} aria-hidden="true" />
-                  Sending...
-                </>
-              ) : (
-                <>
-                  <Send className="mr-2 text-[#F4CE14]" size={18} aria-hidden="true" />
-                  Send Message
-                </>
-              )}
-            </button>
-          </form>
-        </div>
-      </div>
-    ),
-    [loading, sendEmail]
-  );
-
-  const ContactInfoCards = useMemo(
-    () => (
-      <div className="grid sm:grid-cols-2 gap-4">
-        {CONTACT_INFO.map((info, index) => (
-          <div
-            key={index}
-            className={`bg-white p-6 rounded-2xl shadow-sm border border-[#495E57]/10 hover:shadow-md transition-all duration-200 ${
-              info.fullWidth ? 'sm:col-span-2' : ''
-            }`}
-          >
-            <div className="flex items-start gap-4">
-              <div className={`p-3 rounded-full ${info.bgColor}`}>{info.icon}</div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-[#45474B] mb-1">{info.title}</h3>
-                <p className="text-[#45474B]/70">{info.value}</p>
-                <a
-                  href={info.action}
-                  target={info.action.startsWith('http') ? '_blank' : undefined}
-                  rel={info.action.startsWith('http') ? 'noopener noreferrer' : undefined}
-                  className="text-[#495E57] hover:text-[#45474B] hover:underline text-sm mt-2 inline-block transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#495E57] focus:ring-offset-2 rounded"
-                >
-                  {info.actionText}
-                </a>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    ),
-    []
-  );
-
-  const SocialLinks = useMemo(
-    () => (
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-[#495E57]/10">
-        <h3 className="font-semibold text-[#45474B] mb-4">Connect with us</h3>
-        <div className="flex gap-3" role="list" aria-label="Social media links">
-          {SOCIAL_LINKS.map((social, index) => (
-            <a
-              key={index}
-              href={social.url}
-              className={`p-3 rounded-full transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-[#495E57] focus:ring-offset-2 ${social.color}`}
-              aria-label={social.label}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {social.icon}
-            </a>
-          ))}
-        </div>
-      </div>
-    ),
-    []
-  );
-
-  const MapSection = useMemo(
-    () => (
-      <div className="bg-white rounded-2xl shadow-sm border border-[#495E57]/10 overflow-hidden h-64 sm:h-80">
-        <iframe
-          title="CareCamp Location - Dhaka, Bangladesh"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3648.787582899769!2d90.40729131488687!3d23.872331284528456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c4b4c4f34b8d%3A0xe1e88f437e6f4033!2sDhaka!5e0!3m2!1sen!2sbd!4v1650000000000"
-          width="100%"
-          height="100%"
-          allowFullScreen=""
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          className="border-0"
-          aria-label="Interactive map showing CareCamp location in Dhaka, Bangladesh"
-        ></iframe>
-      </div>
-    ),
-    []
+    [SERVICE_ID, TEMPLATE_ID, PUBLIC_KEY, axiosInstance]
   );
 
   return (
-    <div
-      className="min-h-screen bg-gradient-to-b from-[#F5F7F8] to-white py-16 px-4 sm:px-6 lg:px-8"
-      role="main"
-      aria-label="Contact Us"
-    >
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 5000,
-          ...toastStyles,
-        }}
-      />
-      <div className="max-w-6xl mx-auto">
-        {HeaderSection}
+    <div className="min-h-screen bg-[#F5F7F8] dark:bg-slate-950 py-12 sm:py-16 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
+      <Toaster position="top-right" />
+      <div className="max-w-6xl mx-auto space-y-12">
+        {/* Header Section */}
+        <div className="text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-full border border-slate-200/80 dark:border-slate-800 shadow-xs mb-4">
+            <MessageSquare size={16} className="text-[#495E57] dark:text-[#F4CE14]" />
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
+              Get in Touch
+            </span>
+          </div>
+          <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-slate-100 mb-4 tracking-tight">
+            Contact <span className="text-[#495E57] dark:text-[#F4CE14]">CareCamp Support</span>
+          </h1>
+          <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
+            Have questions or feedback? We're here to help and would love to hear from you.
+          </p>
+        </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          {ContactForm}
+        {/* 2-Column Contact Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Contact Form Card (7 Cols) */}
+          <Card className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs p-6 sm:p-8">
+            <CardContent className="p-0 space-y-6">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                  Send us a message
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Fill out the form below and our team will get back to you within 24 hours.
+                </p>
+              </div>
 
-          {/* Contact Info + Map */}
-          <div className="space-y-8">
-            {ContactInfoCards}
-            {SocialLinks}
-            {MapSection}
+              <form ref={form} onSubmit={sendEmail} className="space-y-4" noValidate>
+                <div className="space-y-1">
+                  <label
+                    htmlFor="user_name"
+                    className="text-xs font-bold text-slate-700 dark:text-slate-300"
+                  >
+                    Full Name *
+                  </label>
+                  <Input
+                    type="text"
+                    id="user_name"
+                    name="user_name"
+                    placeholder="John Doe"
+                    required
+                    className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-xs rounded-xl h-10"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label
+                    htmlFor="user_email"
+                    className="text-xs font-bold text-slate-700 dark:text-slate-300"
+                  >
+                    Email Address *
+                  </label>
+                  <Input
+                    type="email"
+                    id="user_email"
+                    name="user_email"
+                    placeholder="john@example.com"
+                    required
+                    className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-xs rounded-xl h-10"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label
+                    htmlFor="message"
+                    className="text-xs font-bold text-slate-700 dark:text-slate-300"
+                  >
+                    Message *
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows={4}
+                    placeholder="How can we help you?"
+                    required
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-xs rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-[#495E57]"
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-[#495E57] dark:bg-[#F4CE14] text-white dark:text-slate-950 font-bold text-xs py-3.5 h-auto rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition cursor-pointer border-none shadow-xs"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="animate-spin" size={16} />
+                      <span>Sending Message...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send size={16} />
+                      <span>Send Message</span>
+                    </>
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+
+          {/* Contact Info & Socials Sidebar (5 Cols) */}
+          <div className="lg:col-span-5 space-y-6">
+            <Card className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs p-6 sm:p-8 space-y-6">
+              <CardContent className="p-0 space-y-6">
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+                    Contact Information
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    Reach out to us directly through any of these channels.
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  {CONTACT_INFO.map((info, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-start gap-4 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800"
+                    >
+                      <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 shrink-0">
+                        {info.icon}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-bold text-slate-400 uppercase">{info.title}</p>
+                        <p className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
+                          {info.value}
+                        </p>
+                        <a
+                          href={info.action}
+                          target={info.action.startsWith('http') ? '_blank' : '_self'}
+                          rel="noopener noreferrer"
+                          className="text-xs font-bold text-[#495E57] dark:text-[#F4CE14] hover:underline inline-block mt-0.5"
+                        >
+                          {info.actionText} →
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                  <p className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3">
+                    Connect With Us
+                  </p>
+                  <div className="flex gap-2">
+                    {SOCIAL_LINKS.map((social, idx) => (
+                      <a
+                        key={idx}
+                        href={social.url}
+                        className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-[#495E57] hover:text-white dark:hover:bg-[#F4CE14] dark:hover:text-slate-950 transition cursor-pointer"
+                        aria-label={social.label}
+                      >
+                        {social.icon}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

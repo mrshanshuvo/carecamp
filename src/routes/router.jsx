@@ -119,10 +119,26 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: 'manage-registered-camps',
+        element: (
+          <OrganizerRoute>
+            <ManageRegistrations />
+          </OrganizerRoute>
+        ),
+      },
+      {
         path: 'analytics',
         element: (
           <ParticipantRoute>
             <Analytics />
+          </ParticipantRoute>
+        ),
+      },
+      {
+        path: 'participant-profile',
+        element: (
+          <ParticipantRoute>
+            <ParticipantProfile />
           </ParticipantRoute>
         ),
       },

@@ -1,83 +1,90 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
 import StatusBadge from './StatusBadge';
+import { Button } from '@/components/ui/button';
 
-const CampCard = ({ camp, onPay, onCancel, onFeedback }) => {
+const CampCard = ({ camp, onPay, onCancel, onFeedback, feedbackDisabled, isCancelling }) => {
   const [expanded, setExpanded] = useState(false);
   const participant = camp.participants[0];
 
   return (
-    <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
-      <div className="p-4">
-        <div className="flex justify-between items-start">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800 overflow-hidden">
+      <div className="p-4 space-y-2">
+        <div className="flex justify-between items-start gap-2">
           <div>
-            <h3 className="font-semibold text-gray-900">{camp.name}</h3>
-            <p className="text-xs text-gray-500">
+            <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">{camp.name}</h3>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
               {format(new Date(camp.dateTime), 'MMM d, yyyy h:mm a')}
             </p>
           </div>
           <button
             onClick={() => setExpanded(!expanded)}
-            className="text-gray-400 hover:text-gray-600"
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
           >
-            <MoreHorizontal className="h-5 w-5" />
+            {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
           </button>
         </div>
 
         {expanded && (
-          <div className="mt-4 space-y-3">
+          <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 space-y-2 text-xs">
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Location:</span>
-              <span className="text-sm font-medium">{camp.location}</span>
+              <span className="text-slate-400">Location:</span>
+              <span className="font-semibold text-slate-700 dark:text-slate-300">
+                {camp.location}
+              </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Fees:</span>
-              <span className="text-sm font-medium">${camp.fees}</span>
+              <span className="text-slate-400">Fees:</span>
+              <span className="font-bold text-slate-900 dark:text-slate-100">${camp.fees}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Participant:</span>
-              <span className="text-sm font-medium">{participant?.participantName || 'N/A'}</span>
+              <span className="text-slate-400">Participant:</span>
+              <span className="font-semibold text-slate-700 dark:text-slate-300">
+                {participant?.participantName || 'N/A'}
+              </span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Payment:</span>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-400">Payment:</span>
               <StatusBadge status={participant?.paymentStatus} />
             </div>
           </div>
         )}
       </div>
 
-      <div className="border-t border-gray-200 px-4 py-3 bg-gray-50 flex justify-between space-x-2">
+      <div className="border-t border-slate-100 dark:border-slate-800 px-4 py-3 bg-slate-50 dark:bg-slate-950 flex gap-2">
         {participant?.paymentStatus !== 'Paid' ? (
           <>
-            <button
+            <Button
+              size="sm"
               onClick={() => onPay(camp)}
-              className="flex-1 px-3 py-1.5 text-xs sm:text-sm bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all"
+              className="flex-1 bg-[#495E57] dark:bg-[#F4CE14] text-white dark:text-slate-950 font-bold text-xs py-2 h-auto rounded-xl border-none"
             >
               Pay Now
-            </button>
-            <button
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              disabled={isCancelling}
               onClick={() => onCancel(camp._id)}
-              className="flex-1 px-3 py-1.5 text-xs sm:text-sm bg-red-500 text-white rounded hover:bg-red-600"
+              className="flex-1 font-bold text-xs py-2 h-auto rounded-xl"
             >
               Cancel
-            </button>
+            </Button>
           </>
         ) : (
-          <>
-            <button
-              onClick={() => onFeedback(camp._id)}
-              className="flex-1 px-3 py-1.5 text-xs sm:text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Feedback
-            </button>
-            <button
-              disabled
-              className="flex-1 px-3 py-1.5 text-xs sm:text-sm bg-gray-300 text-gray-500 rounded cursor-not-allowed"
-            >
-              Cancel
-            </button>
-          </>
+          <Button
+            size="sm"
+            onClick={() => onFeedback(camp)}
+            disabled={feedbackDisabled}
+            className={`w-full font-bold text-xs py-2 h-auto rounded-xl border-none ${
+              feedbackDisabled
+                ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                : 'bg-[#495E57] dark:bg-[#F4CE14] text-white dark:text-slate-950'
+            }`}
+          >
+            {feedbackDisabled ? 'Feedback Submitted' : 'Give Feedback'}
+          </Button>
         )}
       </div>
     </div>

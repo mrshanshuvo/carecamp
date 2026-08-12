@@ -2,6 +2,10 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+html {
+  scrollbar-gutter: stable;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -61,9 +65,13 @@
   }
 }
 
-body {
+body,
+body[data-scroll-locked] {
   background-color: var(--bg-main);
   color: var(--text-primary);
+  overflow: auto !important;
+  padding-right: 0px !important;
+  margin-right: 0px !important;
   transition:
     background-color 0.2s ease,
     color 0.2s ease;

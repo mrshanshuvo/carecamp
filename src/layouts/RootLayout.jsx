@@ -5,15 +5,15 @@ import Footer from '../pages/Shared/Footer/Footer';
 
 const RootLayout = () => {
   return (
-    <div>
+    <div className="min-h-screen bg-[#F5F7F8] dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 flex flex-col justify-between">
       <header>
-        <Navbar></Navbar>
+        <Navbar />
       </header>
-      <main className="pt-14">
-        <Outlet></Outlet>
+      <main className="pt-14 flex-grow">
+        <Outlet />
       </main>
       <footer>
-        <Footer></Footer>
+        <Footer />
       </footer>
     </div>
   );

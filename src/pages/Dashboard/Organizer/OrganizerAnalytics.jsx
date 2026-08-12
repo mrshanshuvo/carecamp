@@ -14,11 +14,23 @@ import {
   Cell,
   Legend,
 } from 'recharts';
-import { Download, DollarSign, Users, Calendar, CheckCircle } from 'lucide-react';
+import {
+  Download,
+  DollarSign,
+  Users,
+  Calendar,
+  CheckCircle,
+  Sparkles,
+  TrendingUp,
+  FileSpreadsheet,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 import SEO from '../../../components/Common/SEO';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
-const COLORS = ['#0f766e', '#0284c7', '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
+const COLORS = ['#495E57', '#F4CE14', '#0284c7', '#10b981', '#8b5cf6', '#ec4899', '#f59e0b'];
 
 const OrganizerAnalytics = () => {
   const axiosSecure = useAxiosSecure();
@@ -92,126 +104,151 @@ const OrganizerAnalytics = () => {
 
   if (isLoading) {
     return (
-      <div className="p-8 text-center text-gray-500 animate-pulse">
+      <div className="p-8 text-center text-xs font-bold text-slate-400 animate-pulse">
         Loading analytics dashboard...
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-8">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
       <SEO
         title="Organizer Analytics"
         description="View camp performance, revenue metrics, and export data."
       />
       {/* Header & Export Actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
-            Organizer Analytics & Reports
+        <div className="space-y-1">
+          <Badge className="bg-[#495E57]/10 dark:bg-slate-800 text-[#495E57] dark:text-[#F4CE14] border border-[#495E57]/20 text-[10px] font-bold px-3 py-1 rounded-full w-fit">
+            <Sparkles size={12} className="mr-1.5 inline" />
+            Executive Reports
+          </Badge>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+            Organizer <span className="text-[#495E57] dark:text-[#F4CE14]">Analytics</span>
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Overview of camp registrations, revenue metrics, and export tools.
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Track revenue growth, participant enrollment distributions, and download data reports.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <button
+          <Button
             type="button"
             onClick={handleDownloadRegistrationsCSV}
             disabled={downloadingRegs}
-            className="flex items-center gap-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-xl shadow-md transition-all text-sm disabled:opacity-50"
+            className="bg-[#495E57] dark:bg-[#F4CE14] text-white dark:text-slate-950 font-bold text-xs h-9 px-3.5 rounded-xl flex items-center gap-2 border-none shadow-xs hover:opacity-90 transition cursor-pointer"
           >
-            <Download size={16} />
-            {downloadingRegs ? 'Downloading...' : 'Export Registrations CSV'}
-          </button>
+            <FileSpreadsheet size={14} />
+            <span>{downloadingRegs ? 'Exporting...' : 'Export Registrations CSV'}</span>
+          </Button>
 
-          <button
+          <Button
             type="button"
             onClick={handleDownloadPaymentsCSV}
             disabled={downloadingPayments}
-            className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl shadow-md transition-all text-sm disabled:opacity-50"
+            variant="outline"
+            className="border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs h-9 px-3.5 rounded-xl flex items-center gap-2 cursor-pointer"
           >
-            <Download size={16} />
-            {downloadingPayments ? 'Downloading...' : 'Export Payments CSV'}
-          </button>
+            <Download size={14} />
+            <span>{downloadingPayments ? 'Exporting...' : 'Export Payments CSV'}</span>
+          </Button>
         </div>
       </div>
 
       {/* Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="p-5 bg-white rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="p-3.5 bg-blue-50 text-blue-600 rounded-xl">
-            <Calendar size={24} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-xs flex items-center gap-4">
+          <div className="p-3.5 bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400 rounded-2xl shrink-0">
+            <Calendar size={22} />
           </div>
           <div>
-            <p className="text-xs text-gray-500 uppercase font-semibold">Total Camps</p>
-            <h3 className="text-2xl font-bold text-gray-800">{summary.totalCamps || 0}</h3>
+            <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">
+              Total Camps
+            </p>
+            <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100">
+              {summary.totalCamps || 0}
+            </h3>
           </div>
-        </div>
+        </Card>
 
-        <div className="p-5 bg-white rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="p-3.5 bg-teal-50 text-teal-600 rounded-xl">
-            <Users size={24} />
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-xs flex items-center gap-4">
+          <div className="p-3.5 bg-emerald-50 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 rounded-2xl shrink-0">
+            <Users size={22} />
           </div>
           <div>
-            <p className="text-xs text-gray-500 uppercase font-semibold">Total Registrations</p>
-            <h3 className="text-2xl font-bold text-gray-800 font-numeric">
+            <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">
+              Total Registrations
+            </p>
+            <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100">
               {summary.totalRegistrations || 0}
             </h3>
           </div>
-        </div>
+        </Card>
 
-        <div className="p-5 bg-white rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="p-3.5 bg-emerald-50 text-emerald-600 rounded-xl">
-            <CheckCircle size={24} />
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-xs flex items-center gap-4">
+          <div className="p-3.5 bg-amber-50 dark:bg-slate-800 text-amber-600 dark:text-amber-400 rounded-2xl shrink-0">
+            <CheckCircle size={22} />
           </div>
           <div>
-            <p className="text-xs text-gray-500 uppercase font-semibold">Paid Registrations</p>
-            <h3 className="text-2xl font-bold text-gray-800">{summary.paidCount || 0}</h3>
+            <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">
+              Confirmed Payments
+            </p>
+            <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100">
+              {summary.paidCount || 0}
+            </h3>
           </div>
-        </div>
+        </Card>
 
-        <div className="p-5 bg-white rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="p-3.5 bg-indigo-50 text-indigo-600 rounded-xl">
-            <DollarSign size={24} />
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-xs flex items-center gap-4">
+          <div className="p-3.5 bg-purple-50 dark:bg-slate-800 text-purple-600 dark:text-purple-400 rounded-2xl shrink-0">
+            <DollarSign size={22} />
           </div>
           <div>
-            <p className="text-xs text-gray-500 uppercase font-semibold">Total Revenue</p>
-            <h3 className="text-2xl font-bold text-gray-800">${summary.totalRevenue || 0}</h3>
+            <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">
+              Total Revenue
+            </p>
+            <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100">
+              ${summary.totalRevenue || 0}
+            </h3>
           </div>
-        </div>
+        </Card>
       </div>
 
-      {/* Charts Grid: Bar Chart & Pie Chart */}
+      {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Revenue Bar Chart */}
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-          <h3 className="text-lg font-bold text-gray-800 mb-4">Monthly Revenue Trends</h3>
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-6 rounded-3xl shadow-xs">
+          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+            <TrendingUp size={16} className="text-[#495E57] dark:text-[#F4CE14]" />
+            Monthly Revenue Trends
+          </h3>
           {formattedChartData.length === 0 ? (
-            <div className="p-8 text-center text-sm text-gray-400">
+            <div className="p-8 text-center text-xs font-bold text-slate-400">
               No completed payment transactions yet to render chart.
             </div>
           ) : (
             <div className="h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={formattedChartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="name" stroke="#888" fontSize={12} />
-                  <YAxis stroke="#888" fontSize={12} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.15} />
+                  <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} />
+                  <YAxis stroke="#94a3b8" fontSize={11} />
                   <Tooltip />
-                  <Bar dataKey="revenue" fill="#0f766e" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="revenue" fill="#495E57" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           )}
-        </div>
+        </Card>
 
         {/* Camp Participant Pie Chart */}
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-          <h3 className="text-lg font-bold text-gray-800 mb-4">Participant Distribution by Camp</h3>
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-6 rounded-3xl shadow-xs">
+          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+            <Users size={16} className="text-[#495E57] dark:text-[#F4CE14]" />
+            Participant Distribution by Camp
+          </h3>
           {pieChartData.length === 0 ? (
-            <div className="p-8 text-center text-sm text-gray-400">
+            <div className="p-8 text-center text-xs font-bold text-slate-400">
               No camp breakdown data available.
             </div>
           ) : (
@@ -238,43 +275,54 @@ const OrganizerAnalytics = () => {
               </ResponsiveContainer>
             </div>
           )}
-        </div>
+        </Card>
       </div>
 
       {/* Camps Breakdown Table */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="p-5 border-b border-gray-100">
-          <h3 className="text-lg font-bold text-gray-800">Camps Performance Overview</h3>
+      <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-xl overflow-hidden">
+        <div className="p-5 border-b border-slate-100 dark:border-slate-800">
+          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+            Camps Performance Breakdown
+          </h3>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-600">
-            <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+          <table className="w-full text-left text-xs text-slate-600 dark:text-slate-400">
+            <thead className="bg-slate-50 dark:bg-slate-950 text-slate-400 uppercase text-[10px] font-bold">
               <tr>
-                <th className="px-6 py-3.5 font-semibold">Camp Name</th>
-                <th className="px-6 py-3.5 font-semibold">Camp Fees</th>
-                <th className="px-6 py-3.5 font-semibold">Participants Registered</th>
+                <th className="px-6 py-3.5">Camp Name</th>
+                <th className="px-6 py-3.5">Camp Fees</th>
+                <th className="px-6 py-3.5">Participants Registered</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {campsBreakdown.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="px-6 py-4 text-center text-gray-400">
+                  <td colSpan={3} className="px-6 py-4 text-center text-slate-400 font-bold">
                     No camps found
                   </td>
                 </tr>
               ) : (
                 campsBreakdown.map((camp) => (
-                  <tr key={camp.campId} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="px-6 py-4 font-medium text-gray-800">{camp.campName}</td>
-                    <td className="px-6 py-4">${camp.fees}</td>
-                    <td className="px-6 py-4">{camp.participantCount}</td>
+                  <tr
+                    key={camp.campId}
+                    className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors"
+                  >
+                    <td className="px-6 py-4 font-bold text-slate-800 dark:text-slate-200">
+                      {camp.campName}
+                    </td>
+                    <td className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-300">
+                      ${camp.fees}
+                    </td>
+                    <td className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-300">
+                      {camp.participantCount}
+                    </td>
                   </tr>
                 ))
               )}
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

@@ -13,8 +13,11 @@ import {
   Legend,
   Cell,
 } from 'recharts';
-import { Calendar, Loader2, AlertCircle } from 'lucide-react';
+import { Calendar, Loader2, AlertCircle, BarChart3, TrendingUp, Award } from 'lucide-react';
 import { FaBangladeshiTakaSign } from 'react-icons/fa6';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 const Analytics = () => {
   const { user } = useAuth();
@@ -45,20 +48,23 @@ const Analytics = () => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-200">
-          <h3 className="font-bold text-gray-800 mb-2">{label}</h3>
-          <div className="space-y-1">
-            <p className="flex items-center text-sm">
-              <FaBangladeshiTakaSign className="mr-2 text-blue-600" size={14} />
-              <span className="font-medium">Fees:</span> ${data.fees}
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-xl border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
+          <h3 className="font-bold text-slate-900 dark:text-slate-100">{label}</h3>
+          <div className="space-y-1 text-slate-600 dark:text-slate-300">
+            <p className="flex items-center">
+              <FaBangladeshiTakaSign
+                className="mr-2 text-[#495E57] dark:text-[#F4CE14]"
+                size={14}
+              />
+              <span className="font-medium mr-1">Fees:</span> ৳{data.fees}
             </p>
-            <p className="flex items-center text-sm">
-              <Calendar className="mr-2 text-purple-600" size={14} />
-              <span className="font-medium">Date:</span> {data.date}
+            <p className="flex items-center">
+              <Calendar className="mr-2 text-slate-400" size={14} />
+              <span className="font-medium mr-1">Date:</span> {data.date}
             </p>
-            <p className="flex items-center text-sm">
-              <span className="mr-2 text-yellow-600">📌</span>
-              <span className="font-medium">Status:</span> {data.status}
+            <p className="flex items-center">
+              <span className="mr-2">📌</span>
+              <span className="font-medium mr-1">Status:</span> {data.status}
             </p>
           </div>
         </div>
@@ -77,9 +83,9 @@ const Analytics = () => {
         x={x + width / 2}
         y={y - 6}
         textAnchor="middle"
-        fill="#16a34a"
+        fill="#10b981"
         fontSize={10}
-        fontWeight="600"
+        fontWeight="700"
       >
         FREE
       </text>
@@ -88,113 +94,147 @@ const Analytics = () => {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 bg-white rounded-3xl shadow-xl border border-gray-100">
-        <Loader2 className="animate-spin h-12 w-12 text-blue-600 mb-4" />
-        <p className="text-gray-600">Loading analytics data...</p>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-3">
+        <Loader2 className="animate-spin h-10 w-10 text-[#495E57] dark:text-[#F4CE14]" />
+        <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
+          Loading Analytics Data...
+        </p>
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
-        <div className="flex items-center">
-          <AlertCircle className="h-5 w-5 text-red-500 mr-3" />
-          <div>
-            <h3 className="text-sm font-medium text-red-800">Error loading analytics</h3>
-            <p className="text-sm text-red-700 mt-1">{error.message || 'Please try again later'}</p>
-          </div>
-        </div>
+      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+        <Card className="bg-red-500/10 border border-red-500/20 p-6 rounded-3xl text-center space-y-3">
+          <AlertCircle className="mx-auto h-8 w-8 text-red-500" />
+          <CardTitle className="text-sm font-bold text-red-600 dark:text-red-400">
+            Error Loading Analytics
+          </CardTitle>
+          <CardDescription className="text-xs text-red-700 dark:text-red-300">
+            {error.message || 'Please try again later'}
+          </CardDescription>
+        </Card>
       </div>
     );
   }
 
   if (!analyticsData.length) {
     return (
-      <div className="bg-blue-50 rounded-xl p-8 text-center">
-        <Calendar className="mx-auto h-12 w-12 text-blue-400 mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-1">No analytics found</h3>
-        <p className="text-gray-500">
-          Your analytics will appear here once you register for medical camps
-        </p>
+      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-12 text-center space-y-4 shadow-xs">
+          <BarChart3 className="mx-auto h-12 w-12 text-slate-400 dark:text-slate-600" />
+          <div>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+              No Analytics Data Found
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
+              Your camp participation and payment charts will automatically appear here once you
+              register for camps.
+            </p>
+          </div>
+          <Button
+            onClick={() => (window.location.href = '/available-camps')}
+            className="bg-[#495E57] dark:bg-[#F4CE14] text-white dark:text-slate-950 font-bold text-xs px-5 py-2.5 h-auto rounded-xl inline-flex items-center gap-2 cursor-pointer"
+          >
+            Browse Available Camps
+          </Button>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f0f9ff] to-white py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center px-4 py-2 bg-blue-100 rounded-full text-blue-800 font-medium mb-3">
-            <div className="w-2 h-2 bg-blue-600 rounded-full mr-2 animate-pulse"></div>
-            Medical Camp Analytics
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Your
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-              {' '}
-              Participation Insights
-            </span>
-          </h2>
-          <p className="text-lg text-gray-600">
-            Visualize your medical camp payments and confirmations
+    <div className="p-4 sm:p-6 lg:p-8 space-y-8 max-w-7xl mx-auto">
+      {/* Header Banner */}
+      <div className="relative overflow-hidden rounded-3xl bg-[#495E57] dark:bg-slate-900 text-white p-6 sm:p-8 border border-white/10 dark:border-slate-800 shadow-xl">
+        <div className="relative z-10 space-y-3">
+          <Badge className="bg-white/15 dark:bg-slate-800 text-white dark:text-[#F4CE14] border border-white/20 px-3 py-1 text-xs font-bold rounded-full">
+            Participation Insights
+          </Badge>
+          <h1 className="text-2xl sm:text-4xl font-black tracking-tight">
+            Medical Camp <span className="text-[#F4CE14]">Analytics</span>
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-200 dark:text-slate-300 max-w-xl leading-relaxed">
+            Visualize your medical camp fees, confirmation records, and overall event statistics.
           </p>
         </div>
+      </div>
 
-        {/* Chart */}
-        <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6">
-          <div className="h-[420px] w-full">
+      {/* Summary KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex items-center gap-4">
+          <div className="p-3.5 rounded-2xl bg-[#495E57]/10 dark:bg-[#F4CE14]/10 text-[#495E57] dark:text-[#F4CE14] border border-[#495E57]/20 dark:border-[#F4CE14]/20">
+            <FaBangladeshiTakaSign size={24} />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+              Total Fees Paid
+            </p>
+            <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-0.5 flex items-center gap-1">
+              <span>৳</span>
+              <span>{chartData.reduce((sum, camp) => sum + (camp.fees || 0), 0).toFixed(2)}</span>
+            </h3>
+          </div>
+        </Card>
+
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex items-center gap-4">
+          <div className="p-3.5 rounded-2xl bg-[#495E57]/10 dark:bg-[#F4CE14]/10 text-[#495E57] dark:text-[#F4CE14] border border-[#495E57]/20 dark:border-[#F4CE14]/20">
+            <Award size={24} />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+              Camps Registered
+            </p>
+            <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100 mt-0.5">
+              {chartData.length}
+            </h3>
+          </div>
+        </Card>
+      </div>
+
+      {/* Main Bar Chart Card */}
+      <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6">
+        <CardHeader className="p-0 pb-4 border-b border-slate-100 dark:border-slate-800">
+          <CardTitle className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <TrendingUp className="text-[#495E57] dark:text-[#F4CE14]" size={20} />
+            Camp Fee Breakdown
+          </CardTitle>
+          <CardDescription className="text-xs text-slate-500 dark:text-slate-400">
+            Individual camp registration costs and fee distributions
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent className="p-0">
+          <div className="h-[380px] w-full pt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <BarChart data={chartData} margin={{ top: 15, right: 20, left: 0, bottom: 10 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.2)" />
                 <XAxis dataKey="name" tick={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} axisLine={false} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(59,130,246,0.08)' }} />
+                <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(73, 94, 87, 0.08)' }} />
                 <Legend
                   verticalAlign="top"
                   align="right"
                   iconType="circle"
-                  wrapperStyle={{ paddingBottom: 8 }}
+                  wrapperStyle={{ paddingBottom: 12, fontSize: '12px' }}
                 />
                 <Bar
                   dataKey="fees"
                   name="Camp Fees (৳)"
-                  radius={[6, 6, 0, 0]}
-                  barSize={28}
+                  radius={[8, 8, 0, 0]}
+                  barSize={32}
                   label={<FreeLabel />}
                 >
                   {chartData.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill="#3b82f6" stroke="#1d4ed8" strokeWidth={0.5} />
+                    <Cell key={`cell-${index}`} fill="#495E57" />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
-
-          {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-            <div className="bg-blue-50/50 p-5 rounded-xl border border-blue-100">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-                <FaBangladeshiTakaSign className="text-blue-600 mr-2" size={20} />
-                Total Fees
-              </h3>
-              <p className="text-2xl font-bold text-blue-600 flex items-center gap-1">
-                <FaBangladeshiTakaSign className="inline-block" />
-                {chartData.reduce((sum, camp) => sum + (camp.fees || 0), 0).toFixed(2)}
-              </p>
-            </div>
-
-            <div className="bg-purple-50/50 p-5 rounded-xl border border-purple-100">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-                <Calendar className="text-purple-600 mr-2" size={20} />
-                Camps Registered
-              </h3>
-              <p className="text-2xl font-bold text-purple-600">{chartData.length}</p>
-            </div>
-          </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

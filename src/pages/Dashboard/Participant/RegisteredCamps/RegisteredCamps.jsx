@@ -17,6 +17,9 @@ import PaymentDialog from './PaymentDialog';
 import FeedbackModal from './FeedbackModal';
 import useAuth from '../../../../hooks/useAuth';
 import useAxiosSecure from '../../../../hooks/useAxiosSecure';
+import { Card, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PK);
 
@@ -106,200 +109,212 @@ const RegisteredCamps = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[300px]">
-        <Loader2 className="animate-spin h-12 w-12 text-blue-600" />
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-3">
+        <Loader2 className="animate-spin h-10 w-10 text-[#495E57] dark:text-[#F4CE14]" />
+        <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
+          Loading Registered Camps...
+        </p>
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg my-6 mx-4 max-w-7xl">
-        <div className="flex items-center">
-          <AlertCircle className="h-5 w-5 text-red-500 mr-3" />
-          <div>
-            <h3 className="text-sm font-medium text-red-800">Error loading registered camps</h3>
-            <p className="text-sm text-red-700 mt-1">{error.message || 'Please try again later'}</p>
-            <button
-              onClick={() => refetch()}
-              className="mt-2 text-sm text-red-600 hover:underline flex items-center"
-            >
-              <ArrowRight className="h-3 w-3 mr-1" />
-              Retry
-            </button>
-          </div>
-        </div>
+      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+        <Card className="bg-red-500/10 border border-red-500/20 p-6 rounded-3xl text-center space-y-3">
+          <AlertCircle className="mx-auto h-8 w-8 text-red-500" />
+          <CardTitle className="text-sm font-bold text-red-600 dark:text-red-400">
+            Error Loading Registered Camps
+          </CardTitle>
+          <CardDescription className="text-xs text-red-700 dark:text-red-300">
+            {error.message || 'Please try again later'}
+          </CardDescription>
+          <Button
+            onClick={() => refetch()}
+            className="bg-red-600 text-white font-bold text-xs px-4 py-2 h-auto rounded-xl inline-flex items-center gap-1.5"
+          >
+            <span>Retry</span>
+            <ArrowRight size={14} />
+          </Button>
+        </Card>
       </div>
     );
   }
 
   if (camps.length === 0) {
     return (
-      <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 md:p-8 text-center my-6 max-w-7xl mx-auto">
-        <CalendarCheck className="mx-auto h-10 w-10 md:h-12 md:w-12 text-blue-400 mb-3 md:mb-4" />
-        <h3 className="text-base md:text-lg font-medium text-gray-900 mb-1">
-          No registered camps found
-        </h3>
-        <p className="text-sm md:text-base text-gray-500 mb-4">
-          Your registered medical camps will appear here once you sign up
-        </p>
-        <a
-          href="/available-camps"
-          className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg transition-all"
-        >
-          Browse Available Camps
-          <ArrowRight className="ml-2 h-4 w-4" />
-        </a>
+      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-12 text-center space-y-4 shadow-xs">
+          <CalendarCheck className="mx-auto h-12 w-12 text-slate-400 dark:text-slate-600" />
+          <div>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+              No Registered Camps Found
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
+              Your registered medical camps will appear here once you sign up.
+            </p>
+          </div>
+          <Button
+            onClick={() => (window.location.href = '/available-camps')}
+            className="bg-[#495E57] dark:bg-[#F4CE14] text-white dark:text-slate-950 font-bold text-xs px-5 py-2.5 h-auto rounded-xl inline-flex items-center gap-2 cursor-pointer"
+          >
+            <span>Browse Available Camps</span>
+            <ArrowRight size={14} />
+          </Button>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f0f9ff] to-white py-8 md:py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center px-4 py-2 bg-blue-100 rounded-full text-blue-800 font-medium mb-4">
-            <div className="w-2 h-2 bg-blue-600 rounded-full mr-2 animate-pulse"></div>
-            Participant Dashboard
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            My
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-              {' '}
-              Registered Camps
-            </span>
-          </h2>
-          <p className="text-lg text-gray-600">
-            View and manage your upcoming medical camp registrations
+    <div className="p-4 sm:p-6 lg:p-8 space-y-8 max-w-7xl mx-auto">
+      {/* Header Banner */}
+      <div className="relative overflow-hidden rounded-3xl bg-[#495E57] dark:bg-slate-900 text-white p-6 sm:p-8 border border-white/10 dark:border-slate-800 shadow-xl">
+        <div className="relative z-10 space-y-3">
+          <Badge className="bg-white/15 dark:bg-slate-800 text-white dark:text-[#F4CE14] border border-white/20 px-3 py-1 text-xs font-bold rounded-full">
+            Participant Portal
+          </Badge>
+          <h1 className="text-2xl sm:text-4xl font-black tracking-tight">
+            My Registered <span className="text-[#F4CE14]">Camps</span>
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-200 dark:text-slate-300 max-w-xl leading-relaxed">
+            Manage your upcoming medical camp registrations, complete fee payments, and submit
+            experience feedback.
           </p>
         </div>
+      </div>
 
-        {/* Mobile View */}
-        <div className="block md:hidden space-y-4">
-          {camps.map((camp) => (
-            <div
-              key={camp._id}
-              className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden"
-            >
-              <CampCard
-                camp={camp}
-                onPay={() => {
-                  setPaymentCamp(camp);
-                  setPaymentRegistration(camp.participants[0]);
-                }}
-                onCancel={cancelRegistration}
-                onFeedback={() => {
-                  if (!camp.hasFeedback) {
-                    setFeedbackCampId(camp._id);
-                  } else {
-                    toast.error('You already submitted feedback for this camp');
-                  }
-                }}
-                feedbackDisabled={camp.hasFeedback}
-                isCancelling={isCancelling}
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* Desktop View */}
-        <div className="hidden md:block">
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-            <CampTable
-              camps={camps}
-              onPay={(camp) => {
+      {/* Mobile View */}
+      <div className="block md:hidden space-y-4">
+        {camps.map((camp) => (
+          <div
+            key={camp._id}
+            className="bg-white dark:bg-slate-900 rounded-2xl shadow-md border border-slate-200/80 dark:border-slate-800 overflow-hidden"
+          >
+            <CampCard
+              camp={camp}
+              onPay={() => {
                 setPaymentCamp(camp);
                 setPaymentRegistration(camp.participants[0]);
               }}
               onCancel={cancelRegistration}
-              onFeedback={(camp) => {
+              onFeedback={() => {
                 if (!camp.hasFeedback) {
                   setFeedbackCampId(camp._id);
                 } else {
                   toast.error('You already submitted feedback for this camp');
                 }
               }}
+              feedbackDisabled={camp.hasFeedback}
               isCancelling={isCancelling}
             />
           </div>
-        </div>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex justify-center items-center mt-8 gap-2">
-            <button
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
-              className="px-3 py-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              First
-            </button>
-            <button
-              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-              disabled={currentPage === 1}
-              className="px-3 py-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-            >
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              Previous
-            </button>
-
-            {getPaginationRange().map((pageNum) => (
-              <button
-                key={pageNum}
-                onClick={() => setCurrentPage(pageNum)}
-                className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  currentPage === pageNum
-                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                    : 'hover:bg-gray-100'
-                }`}
-              >
-                {pageNum}
-              </button>
-            ))}
-
-            <button
-              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-            >
-              Next
-              <ChevronRight className="h-4 w-4 ml-1" />
-            </button>
-            <button
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Last
-            </button>
-          </div>
-        )}
-
-        {/* Payment Dialog */}
-        <Elements stripe={stripePromise}>
-          <PaymentDialog
-            open={!!paymentCamp}
-            onClose={() => {
-              setPaymentCamp(null);
-              setPaymentRegistration(null);
-            }}
-            camp={paymentCamp}
-            registration={paymentRegistration}
-            onPaymentSuccess={handlePaymentSuccess}
-          />
-        </Elements>
-
-        {/* Feedback Modal */}
-        {feedbackCampId && (
-          <FeedbackModal
-            campId={feedbackCampId}
-            onClose={() => setFeedbackCampId(null)}
-            onSubmit={submitFeedback}
-            isSubmitting={isSubmittingFeedback}
-          />
-        )}
+        ))}
       </div>
+
+      {/* Desktop View */}
+      <div className="hidden md:block">
+        <CampTable
+          camps={camps}
+          onPay={(camp) => {
+            setPaymentCamp(camp);
+            setPaymentRegistration(camp.participants[0]);
+          }}
+          onCancel={cancelRegistration}
+          onFeedback={(camp) => {
+            if (!camp.hasFeedback) {
+              setFeedbackCampId(camp._id);
+            } else {
+              toast.error('You already submitted feedback for this camp');
+            }
+          }}
+          isCancelling={isCancelling}
+        />
+      </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 pt-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setCurrentPage(1)}
+            disabled={currentPage === 1}
+            className="h-9 text-xs font-bold rounded-xl border-slate-200 dark:border-slate-800"
+          >
+            First
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+            disabled={currentPage === 1}
+            className="h-9 text-xs font-bold rounded-xl border-slate-200 dark:border-slate-800 gap-1"
+          >
+            <ChevronLeft size={14} />
+            <span>Prev</span>
+          </Button>
+
+          {getPaginationRange().map((pageNum) => (
+            <Button
+              key={pageNum}
+              size="sm"
+              onClick={() => setCurrentPage(pageNum)}
+              className={`w-9 h-9 p-0 text-xs font-bold rounded-xl cursor-pointer ${
+                currentPage === pageNum
+                  ? 'bg-[#495E57] dark:bg-[#F4CE14] text-white dark:text-slate-950 border-none'
+                  : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+            >
+              {pageNum}
+            </Button>
+          ))}
+
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="h-9 text-xs font-bold rounded-xl border-slate-200 dark:border-slate-800 gap-1"
+          >
+            <span>Next</span>
+            <ChevronRight size={14} />
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setCurrentPage(totalPages)}
+            disabled={currentPage === totalPages}
+            className="h-9 text-xs font-bold rounded-xl border-slate-200 dark:border-slate-800"
+          >
+            Last
+          </Button>
+        </div>
+      )}
+
+      {/* Payment Dialog */}
+      <Elements stripe={stripePromise}>
+        <PaymentDialog
+          open={!!paymentCamp}
+          onClose={() => {
+            setPaymentCamp(null);
+            setPaymentRegistration(null);
+          }}
+          camp={paymentCamp}
+          registration={paymentRegistration}
+          onPaymentSuccess={handlePaymentSuccess}
+        />
+      </Elements>
+
+      {/* Feedback Modal */}
+      {feedbackCampId && (
+        <FeedbackModal
+          campId={feedbackCampId}
+          onClose={() => setFeedbackCampId(null)}
+          onSubmit={submitFeedback}
+          isSubmitting={isSubmittingFeedback}
+        />
+      )}
     </div>
   );
 };

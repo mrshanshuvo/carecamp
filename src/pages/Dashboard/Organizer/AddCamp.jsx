@@ -1,25 +1,45 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
-import { Calendar, MapPin, User, Upload, Loader2 } from 'lucide-react';
+import {
+  Calendar,
+  MapPin,
+  User,
+  Upload,
+  Loader2,
+  Sparkles,
+  Stethoscope,
+  CheckCircle2,
+  Image as ImageIcon,
+  DollarSign,
+} from 'lucide-react';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router';
-import { FaBangladeshiTakaSign } from 'react-icons/fa6';
+import { Card, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 
 const imgbbAPIKey = import.meta.env.VITE_IMGBB_API_KEY;
 
 const AddCamp = () => {
   const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
+  const [imagePreview, setImagePreview] = useState(null);
+  const [imageUploading, setImageUploading] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    // reset,
   } = useForm();
 
-  const [imageUploading, setImageUploading] = useState(false);
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
 
   const onSubmit = async (data) => {
     try {
@@ -40,7 +60,6 @@ const AddCamp = () => {
       }
 
       const imageURL = imgbbData.data.display_url;
-
       setImageUploading(false);
 
       const campData = {
@@ -55,258 +74,230 @@ const AddCamp = () => {
       };
 
       const response = await axiosSecure.post('/camps', campData);
-      // console.log("Response from server:", response.data);
       if (response.data.campId) {
-        // reset();
         Swal.fire({
           icon: 'success',
           title: 'Medical Camp Created!',
-          html: `
-          <p>Your camp was submitted successfully.</p>
-          <button id="goDashboard" style="
-            margin-top: 12px;
-            background-color: #3085d6;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-          ">
-            Go to Manage Camps
-          </button>
-        `,
-          showConfirmButton: false,
-          showCloseButton: true, // shows the "X" button
-          didOpen: () => {
-            const btn = Swal.getPopup().querySelector('#goDashboard');
-            btn.addEventListener('click', () => {
-              Swal.close();
-              navigate('/dashboard/manage-camps');
-            });
-          },
+          text: 'Your new medical camp has been successfully registered.',
+          confirmButtonColor: '#495E57',
+          confirmButtonText: 'Go to Manage Camps',
+        }).then(() => {
+          navigate('/dashboard/manage-camps');
         });
       }
     } catch (error) {
       console.error(error);
       Swal.fire({
         icon: 'error',
-        title: 'Oops...',
-        text: 'Something went wrong!',
+        title: 'Submission Error',
+        text: error.message || 'Something went wrong while creating the camp.',
+        confirmButtonColor: '#ef4444',
       });
+    } finally {
+      setImageUploading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f0f9ff] to-white py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        {/* Header with medical badge */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center px-4 py-2 bg-blue-100 rounded-full text-blue-800 font-medium mb-4">
-            <div className="w-2 h-2 bg-blue-600 rounded-full mr-2 animate-pulse"></div>
-            Create New Medical Camp
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Organize a
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-              {' '}
-              Healthcare Camp
-            </span>
-          </h2>
-          <p className="text-lg text-gray-600">
-            Fill out the form below to add a new medical camp to our system
-          </p>
-        </div>
+    <div className="p-4 sm:p-6 lg:p-8 space-y-8 max-w-4xl mx-auto">
+      {/* Page Title Header */}
+      <div className="space-y-1">
+        <Badge className="bg-[#495E57]/10 dark:bg-slate-800 text-[#495E57] dark:text-[#F4CE14] border border-[#495E57]/20 text-[10px] font-bold px-3 py-1 rounded-full w-fit">
+          <Sparkles size={12} className="mr-1.5 inline" />
+          Organizer Hub
+        </Badge>
+        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+          Create New <span className="text-[#495E57] dark:text-[#F4CE14]">Medical Camp</span>
+        </h1>
+        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xl">
+          Publish a healthcare initiative, set registration parameters, and assign medical
+          personnel.
+        </p>
+      </div>
 
-        {/* Form card */}
-        <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 p-6 sm:p-8">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Camp Name */}
-            <div className="space-y-2">
-              <label className="block text-lg font-semibold text-gray-800">Camp Name*</label>
-              <input
+      {/* Main Form Card */}
+      <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-xl overflow-hidden p-6 sm:p-8">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
+          {/* Camp Name */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+              Camp Title / Name *
+            </label>
+            <div className="relative">
+              <Input
                 type="text"
-                {...register('name', { required: 'Camp Name is required' })}
-                className={`w-full px-4 py-3 rounded-xl border ${
-                  errors.name
-                    ? 'border-red-400 focus:ring-red-300'
-                    : 'border-gray-300 focus:ring-blue-300'
-                } focus:outline-none focus:ring-2`}
-                placeholder="Enter camp name"
+                {...register('name', { required: 'Camp name is required' })}
+                className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs rounded-xl h-11 pl-10"
+                placeholder="e.g. Free Eye Care & Pediatric Health Drive"
               />
-              {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+              <Stethoscope size={16} className="absolute left-3.5 top-3.5 text-slate-400" />
             </div>
+            {errors.name && (
+              <p className="text-xs font-bold text-rose-500 mt-1">{errors.name.message}</p>
+            )}
+          </div>
 
-            {/* Camp Image */}
-            <div className="space-y-2">
-              <label className="block text-lg font-semibold text-gray-800">Camp Image*</label>
-              <div className="flex items-center justify-center w-full">
-                <label
-                  htmlFor="dropzone-file"
-                  className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer ${
-                    errors.image
-                      ? 'border-red-400 bg-red-50'
-                      : 'border-gray-300 hover:border-blue-500 bg-gray-50 hover:bg-blue-50'
-                  } transition-colors`}
-                >
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <Upload className="mb-3 text-gray-500" size={24} />
-                    <p className="mb-2 text-sm text-gray-500">
-                      <span className="font-semibold">Click to upload</span> or drag and drop
-                    </p>
-                    <p className="text-xs text-gray-500">PNG, JPG (MAX. 5MB)</p>
-                  </div>
-                  <input
-                    id="dropzone-file"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    {...register('image', {
-                      required: 'Camp Image is required',
-                    })}
-                  />
-                </label>
-              </div>
-              {errors.image && <p className="text-red-500 text-sm">{errors.image.message}</p>}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Camp Fees */}
-              <div className="space-y-2">
-                <label className="block text-lg font-semibold text-gray-800">
-                  Camp Fees (USD)*
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <FaBangladeshiTakaSign className="text-gray-500" size={18} />
-                  </div>
-                  <input
-                    type="number"
-                    step="0.01"
-                    {...register('fees', {
-                      required: 'Camp Fees is required',
-                      min: { value: 0, message: 'Fees must be positive' },
-                    })}
-                    className={`w-full pl-10 pr-4 py-3 rounded-xl border ${
-                      errors.fees
-                        ? 'border-red-400 focus:ring-red-300'
-                        : 'border-gray-300 focus:ring-blue-300'
-                    } focus:outline-none focus:ring-2`}
-                    placeholder="0.00"
-                  />
-                </div>
-                {errors.fees && <p className="text-red-500 text-sm">{errors.fees.message}</p>}
-              </div>
-
-              {/* Date and Time */}
-              <div className="space-y-2">
-                <label className="block text-lg font-semibold text-gray-800">Date & Time*</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <Calendar className="text-gray-500" size={18} />
-                  </div>
-                  <input
-                    type="datetime-local"
-                    {...register('dateTime', {
-                      required: 'Date & Time is required',
-                    })}
-                    className={`w-full pl-10 pr-4 py-3 rounded-xl border ${
-                      errors.dateTime
-                        ? 'border-red-400 focus:ring-red-300'
-                        : 'border-gray-300 focus:ring-blue-300'
-                    } focus:outline-none focus:ring-2`}
-                  />
-                </div>
-                {errors.dateTime && (
-                  <p className="text-red-500 text-sm">{errors.dateTime.message}</p>
+          {/* Image Upload Dropzone with Live Preview */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+              Camp Banner Photo *
+            </label>
+            <div className="flex flex-col sm:flex-row items-center gap-4 p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800">
+              <div className="w-24 h-20 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 bg-slate-200 dark:bg-slate-800 flex items-center justify-center relative">
+                {imagePreview ? (
+                  <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                ) : (
+                  <ImageIcon size={24} className="text-slate-400" />
                 )}
               </div>
+              <div className="flex-1 text-center sm:text-left space-y-1">
+                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                  {imagePreview ? 'Image Selected' : 'Upload camp promotional image'}
+                </p>
+                <p className="text-[10px] text-slate-400">
+                  Supports PNG, JPG, or WEBP. Max size 5MB.
+                </p>
+              </div>
+              <label htmlFor="camp-image-file" className="cursor-pointer shrink-0">
+                <div className="bg-[#495E57] dark:bg-[#F4CE14] text-white dark:text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-1.5 hover:opacity-90 transition">
+                  <Upload size={14} />
+                  <span>{imagePreview ? 'Change Photo' : 'Select Photo'}</span>
+                </div>
+                <input
+                  id="camp-image-file"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  {...register('image', {
+                    required: 'Camp photo is required',
+                    onChange: handleImageChange,
+                  })}
+                />
+              </label>
+            </div>
+            {errors.image && (
+              <p className="text-xs font-bold text-rose-500 mt-1">{errors.image.message}</p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {/* Camp Fees */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Registration Fee (USD) *
+              </label>
+              <div className="relative">
+                <Input
+                  type="number"
+                  step="0.01"
+                  {...register('fees', {
+                    required: 'Registration fee is required',
+                    min: { value: 0, message: 'Fee cannot be negative' },
+                  })}
+                  className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs rounded-xl h-11 pl-10"
+                  placeholder="0.00 (Enter 0 for Free)"
+                />
+                <DollarSign size={16} className="absolute left-3.5 top-3.5 text-slate-400" />
+              </div>
+              {errors.fees && (
+                <p className="text-xs font-bold text-rose-500 mt-1">{errors.fees.message}</p>
+              )}
+            </div>
+
+            {/* Date and Time */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Date & Start Time *
+              </label>
+              <div className="relative">
+                <Input
+                  type="datetime-local"
+                  {...register('dateTime', { required: 'Date and time is required' })}
+                  className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs rounded-xl h-11 pl-10"
+                />
+                <Calendar size={16} className="absolute left-3.5 top-3.5 text-slate-400" />
+              </div>
+              {errors.dateTime && (
+                <p className="text-xs font-bold text-rose-500 mt-1">{errors.dateTime.message}</p>
+              )}
             </div>
 
             {/* Location */}
-            <div className="space-y-2">
-              <label className="block text-lg font-semibold text-gray-800">Location*</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Venue Location *
+              </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <MapPin className="text-gray-500" size={18} />
-                </div>
-                <input
+                <Input
                   type="text"
-                  {...register('location', {
-                    required: 'Location is required',
-                  })}
-                  className={`w-full pl-10 pr-4 py-3 rounded-xl border ${
-                    errors.location
-                      ? 'border-red-400 focus:ring-red-300'
-                      : 'border-gray-300 focus:ring-blue-300'
-                  } focus:outline-none focus:ring-2`}
-                  placeholder="Enter camp location"
+                  {...register('location', { required: 'Venue location is required' })}
+                  className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs rounded-xl h-11 pl-10"
+                  placeholder="e.g. Dhanmondi General Hospital, Dhaka"
                 />
+                <MapPin size={16} className="absolute left-3.5 top-3.5 text-slate-400" />
               </div>
-              {errors.location && <p className="text-red-500 text-sm">{errors.location.message}</p>}
+              {errors.location && (
+                <p className="text-xs font-bold text-rose-500 mt-1">{errors.location.message}</p>
+              )}
             </div>
 
             {/* Healthcare Professional */}
-            <div className="space-y-2">
-              <label className="block text-lg font-semibold text-gray-800">
-                Healthcare Professional*
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Lead Doctor / Specialist *
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <User className="text-gray-500" size={18} />
-                </div>
-                <input
+                <Input
                   type="text"
                   {...register('healthcareProfessional', {
-                    required: 'Healthcare Professional is required',
+                    required: 'Healthcare professional is required',
                   })}
-                  className={`w-full pl-10 pr-4 py-3 rounded-xl border ${
-                    errors.healthcareProfessional
-                      ? 'border-red-400 focus:ring-red-300'
-                      : 'border-gray-300 focus:ring-blue-300'
-                  } focus:outline-none focus:ring-2`}
-                  placeholder="Enter professional's name"
+                  className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs rounded-xl h-11 pl-10"
+                  placeholder="e.g. Dr. Ayesha Siddiqua, MBBS, FCPS"
                 />
+                <User size={16} className="absolute left-3.5 top-3.5 text-slate-400" />
               </div>
               {errors.healthcareProfessional && (
-                <p className="text-red-500 text-sm">{errors.healthcareProfessional.message}</p>
+                <p className="text-xs font-bold text-rose-500 mt-1">
+                  {errors.healthcareProfessional.message}
+                </p>
               )}
             </div>
+          </div>
 
-            {/* Description */}
-            <div className="space-y-2">
-              <label className="block text-lg font-semibold text-gray-800">
-                Description (optional)
-              </label>
-              <textarea
-                {...register('description')}
-                rows={4}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
-                placeholder="Enter camp description..."
-              />
-            </div>
+          {/* Description */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+              Camp Overview & Details (Optional)
+            </label>
+            <textarea
+              {...register('description')}
+              rows={4}
+              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 text-xs rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-[#495E57] resize-none"
+              placeholder="Outline services provided, special instructions, required documents..."
+            />
+          </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isSubmitting || imageUploading}
-              className={`w-full py-4 px-6 rounded-xl font-bold text-white transition-all duration-300 ${
-                isSubmitting || imageUploading
-                  ? 'bg-blue-400'
-                  : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl'
-              } flex items-center justify-center`}
-            >
-              {isSubmitting || imageUploading ? (
-                <>
-                  <Loader2 className="animate-spin mr-2" size={20} />
-                  Processing...
-                </>
-              ) : (
-                'Create Medical Camp'
-              )}
-            </button>
-          </form>
-        </div>
-      </div>
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            disabled={isSubmitting || imageUploading}
+            className="w-full bg-[#495E57] dark:bg-[#F4CE14] text-white dark:text-slate-950 font-bold text-xs py-3.5 h-auto rounded-xl flex items-center justify-center gap-2 border-none shadow-xs hover:opacity-90 transition cursor-pointer"
+          >
+            {isSubmitting || imageUploading ? (
+              <>
+                <Loader2 className="animate-spin" size={16} />
+                <span>Publishing Medical Camp...</span>
+              </>
+            ) : (
+              <>
+                <CheckCircle2 size={16} />
+                <span>Publish Medical Camp</span>
+              </>
+            )}
+          </Button>
+        </form>
+      </Card>
     </div>
   );
 };

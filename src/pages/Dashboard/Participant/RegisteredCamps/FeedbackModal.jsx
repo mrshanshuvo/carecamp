@@ -8,6 +8,35 @@ const FeedbackModal = ({ campId, onClose, onSubmit }) => {
   const [imageInput, setImageInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (images.length >= 5) return;
+
+    setUploadingImage(true);
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const apiKey = import.meta.env.VITE_IMGBB_API_KEY;
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setImages((prev) => [...prev, data.data.display_url]);
+      }
+    } catch (err) {
+      console.error('Failed to upload image:', err);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const handleAddImage = (e) => {
     e.preventDefault();
     if (!imageInput.trim()) return;
@@ -100,18 +129,40 @@ const FeedbackModal = ({ campId, onClose, onSubmit }) => {
                 type="url"
                 value={imageInput}
                 onChange={(e) => setImageInput(e.target.value)}
-                placeholder="Paste photo URL (e.g. ImgBB / Unsplash)"
+                placeholder="Paste URL or upload image file..."
                 className="flex-1 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#495E57]"
               />
-              <button
-                type="button"
-                onClick={handleAddImage}
-                disabled={!imageInput.trim() || images.length >= 5}
-                className="px-3 py-2 bg-[#495E57] dark:bg-[#F4CE14] text-white dark:text-slate-950 rounded-xl text-xs font-bold hover:opacity-90 disabled:opacity-50 flex items-center gap-1 cursor-pointer"
-              >
-                <Plus size={14} />
-                <span>Add</span>
-              </button>
+              {imageInput.trim() && (
+                <button
+                  type="button"
+                  onClick={handleAddImage}
+                  disabled={images.length >= 5}
+                  className="px-3 py-2 bg-[#495E57] dark:bg-[#F4CE14] text-white dark:text-slate-950 rounded-xl text-xs font-bold hover:opacity-90 disabled:opacity-50 flex items-center gap-1 cursor-pointer shrink-0"
+                >
+                  <Plus size={14} />
+                  <span>Add URL</span>
+                </button>
+              )}
+              <label htmlFor="feedback-file-upload" className="cursor-pointer shrink-0">
+                <div className="px-3 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center gap-1">
+                  {uploadingImage ? (
+                    <span>Uploading...</span>
+                  ) : (
+                    <>
+                      <ImageIcon size={14} />
+                      <span>Upload</span>
+                    </>
+                  )}
+                </div>
+                <input
+                  id="feedback-file-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  disabled={uploadingImage || images.length >= 5}
+                />
+              </label>
             </div>
 
             {/* Thumbnail previews */}

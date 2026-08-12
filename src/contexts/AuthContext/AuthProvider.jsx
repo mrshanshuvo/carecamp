@@ -39,12 +39,23 @@ const AuthProvider = ({ children }) => {
 
   const logOut = () => {
     setLoading(true);
+    localStorage.removeItem('token');
     return signOut(auth).finally(() => setLoading(false));
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+      if (currentUser) {
+        try {
+          const token = await currentUser.getIdToken();
+          localStorage.setItem('token', token);
+        } catch (err) {
+          console.error('Error retrieving user token:', err);
+        }
+      } else {
+        localStorage.removeItem('token');
+      }
       setLoading(false);
     });
     return unsubscribe;

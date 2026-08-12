@@ -13,11 +13,31 @@ import {
   ArrowRight,
   ChevronLeft,
   ChevronRight,
-  Grid,
-  List,
-  Star,
+  ChevronDown,
+  Tag,
 } from 'lucide-react';
 import { FaBangladeshiTakaSign } from 'react-icons/fa6';
+
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+} from '@/components/ui/dropdown-menu';
+
+const SORT_OPTIONS = [
+  { value: 'participantCount', label: 'Most Popular' },
+  { value: 'campFeesAsc', label: 'Price: Low to High' },
+  { value: 'campFeesDesc', label: 'Price: High to Low' },
+  { value: 'alphabetical', label: 'A-Z' },
+  { value: 'dateAsc', label: 'Date: Earliest' },
+  { value: 'dateDesc', label: 'Date: Latest' },
+];
 
 const fetchCamps = async ({ queryKey, axiosInstance }) => {
   const [_key, { page, search, sort }] = queryKey;
@@ -34,7 +54,6 @@ const AvailableCamps = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('participantCount');
-  const [layout, setLayout] = useState('grid-3'); // 'grid-2' or 'grid-3'
 
   const axiosInstance = useAxios();
 
@@ -49,172 +68,169 @@ const AvailableCamps = () => {
     setPage(1);
   };
 
-  const handleSortChange = (e) => {
-    setSort(e.target.value);
+  const handleSortChange = (newSort) => {
+    setSort(newSort);
     setPage(1);
-  };
-
-  const toggleLayout = () => {
-    setLayout(layout === 'grid-3' ? 'grid-2' : 'grid-3');
   };
 
   const camps = data?.data || [];
   const totalPages = data?.meta?.totalPages || 1;
 
-  // Fallback image URL
-  const getFallbackImage = (campName) => {
-    return `https://placehold.co/400x300/495E57/F4CE14/png?text=${encodeURIComponent(campName)}`;
+  const getFallbackImage = () => {
+    return 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&q=80';
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50/50 py-10 px-4 sm:px-6 lg:px-8">
-      <SEO title="Available Camps" description="Explore upcoming medical camps near you." />
-      <div className="container mx-auto px-4 max-w-7xl">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-[#495E57]/10 text-[#495E57] px-4 py-2 rounded-full text-sm font-medium mb-4">
-            <Star size={16} className="text-[#F4CE14]" fill="#F4CE14" />
-            Available Medical Camps
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-[#45474B] mb-4">
-            Available
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#495E57] to-[#F4CE14]">
-              {' '}
-              Medical Camps
-            </span>
-          </h1>
-          <p className="text-lg text-[#45474B]/70 max-w-2xl mx-auto">
-            Find and join medical camps that match your expertise and interests
-          </p>
-        </div>
+  const currentSortLabel = SORT_OPTIONS.find((opt) => opt.value === sort)?.label || 'Sort';
 
-        {/* Search, Sort and Layout Controls */}
-        <div className="flex flex-col md:flex-row justify-between gap-4 mb-8">
-          <div className="relative flex-1 max-w-2xl">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#495E57]" size={18} />
-            <input
+  return (
+    <div className="min-h-screen bg-[#F5F7F8] dark:bg-slate-950 py-6 px-4 transition-colors duration-200">
+      <SEO title="Available Camps" description="Explore upcoming medical camps near you." />
+      <div className="max-w-7xl mx-auto">
+        {/* Search & Sort Controls */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 bg-white dark:bg-slate-900 p-1 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+          <div className="relative flex-1 w-full">
+            <Search
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+              size={18}
+            />
+            <Input
               type="text"
-              placeholder="Search camps by name, location or professional..."
+              placeholder="Search camps by name, location or specialist..."
               value={search}
               onChange={handleSearchChange}
-              className="w-full pl-10 pr-4 py-3 border border-[#495E57]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#495E57] focus:border-transparent bg-white"
+              className="h-10 w-full pl-10 pr-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white rounded-xl text-xs sm:text-sm focus-visible:ring-2 focus-visible:ring-[#495E57]"
             />
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={toggleLayout}
-                className="p-2 rounded-lg border border-[#495E57]/20 hover:bg-[#495E57]/10 transition-colors"
-                aria-label="Toggle layout"
+          <div className="flex items-center gap-3 shrink-0">
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="h-10 min-w-[190px] bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-between gap-2 px-4 cursor-pointer"
+                >
+                  <span>{currentSortLabel}</span>
+                  <ChevronDown size={14} className="text-slate-400 shrink-0" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="bottom"
+                align="end"
+                sideOffset={8}
+                className="w-[190px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-md p-1"
               >
-                {layout === 'grid-3' ? (
-                  <Grid className="text-[#495E57]" size={20} />
-                ) : (
-                  <List className="text-[#495E57]" size={20} />
-                )}
-              </button>
-            </div>
-
-            <label htmlFor="sort" className="text-[#45474B] whitespace-nowrap">
-              Sort by:
-            </label>
-            <select
-              id="sort"
-              value={sort}
-              onChange={handleSortChange}
-              className="px-4 py-2 border border-[#495E57]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#495E57] focus:border-transparent bg-white"
-            >
-              <option value="participantCount">Most Popular</option>
-              <option value="campFeesAsc">Price: Low to High</option>
-              <option value="campFeesDesc">Price: High to Low</option>
-              <option value="alphabetical">A-Z</option>
-              <option value="dateAsc">Date: Earliest</option>
-              <option value="dateDesc">Date: Latest</option>
-            </select>
+                <DropdownMenuRadioGroup value={sort} onValueChange={handleSortChange}>
+                  {SORT_OPTIONS.map((option) => (
+                    <DropdownMenuRadioItem
+                      key={option.value}
+                      value={option.value}
+                      className="text-xs font-medium cursor-pointer rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+                    >
+                      {option.label}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
         {/* Content */}
         {isError ? (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">Error loading camps</h3>
-                <div className="mt-2 text-sm text-red-700">
-                  <p>{error.message}</p>
-                </div>
-              </div>
-            </div>
+          <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 p-6 rounded-3xl text-center">
+            <h3 className="text-base font-bold text-red-800 dark:text-red-300 mb-1">
+              Failed to load medical camps
+            </h3>
+            <p className="text-xs text-red-600 dark:text-red-400">{error.message}</p>
           </div>
         ) : isLoading ? (
-          <div
-            className={`grid grid-cols-1 ${
-              layout === 'grid-3' ? 'sm:grid-cols-2 lg:grid-cols-3' : 'sm:grid-cols-2'
-            } gap-8`}
-          >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, index) => (
               <CampCardSkeleton key={index} />
             ))}
           </div>
+        ) : camps.length === 0 ? (
+          <div className="text-center py-16 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-slate-100 dark:bg-slate-800 mb-3">
+              <Search className="h-6 w-6 text-slate-400" />
+            </div>
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
+              No medical camps found
+            </h3>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+              Try adjusting your search keywords or sorting criteria.
+            </p>
+          </div>
         ) : (
           <>
-            {camps.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-[#495E57]/10">
-                  <Search className="h-6 w-6 text-[#495E57]" />
-                </div>
-                <h3 className="mt-2 text-lg font-medium text-[#45474B]">No camps found</h3>
-                <p className="mt-1 text-[#45474B]/70">
-                  Try adjusting your search or filter to find what you're looking for.
-                </p>
-              </div>
-            ) : (
-              <>
-                <div
-                  className={`grid grid-cols-1 ${
-                    layout === 'grid-3' ? 'sm:grid-cols-2 lg:grid-cols-3' : 'sm:grid-cols-2'
-                  } gap-8`}
-                >
-                  {camps.map((camp) => (
-                    <div
-                      key={camp._id}
-                      className="bg-white border border-[#495E57]/10 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
-                    >
-                      <div className="relative h-48 bg-gradient-to-br from-[#495E57]/10 to-[#F4CE14]/10 overflow-hidden">
-                        <img
-                          src={camp.imageURL || getFallbackImage(camp.name)}
-                          alt={camp.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          onError={(e) => {
-                            e.target.src = getFallbackImage(camp.name);
-                          }}
-                        />
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#45474B] to-transparent p-4">
-                          <h2 className="text-xl font-bold text-white">{camp.name}</h2>
-                        </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {camps.map((camp) => {
+                const targetCapacity = camp.targetCapacity || 250;
+                const progressPct = Math.min((camp.participantCount / targetCapacity) * 100, 100);
+
+                return (
+                  <Card
+                    key={camp._id}
+                    className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 flex flex-col group p-0"
+                  >
+                    {/* Image Header with Price & Specialist Badge */}
+                    <div className="relative h-52 overflow-hidden bg-slate-100 dark:bg-slate-800">
+                      <img
+                        src={camp.imageURL || camp.image || getFallbackImage()}
+                        alt={camp.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => {
+                          e.target.src = getFallbackImage();
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+
+                      {/* Specialist Tag Badge */}
+                      <div className="absolute top-3 left-3">
+                        <Badge
+                          variant="secondary"
+                          className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-slate-800 dark:text-slate-200 text-[11px] font-extrabold px-3 py-1 rounded-full border border-slate-200/60 dark:border-slate-800 flex items-center gap-1 shadow-xs"
+                        >
+                          <Tag size={12} className="text-[#495E57] dark:text-[#F4CE14]" />
+                          <span>{camp.healthcareProfessional || 'General Medical'}</span>
+                        </Badge>
                       </div>
-                      <div className="p-6 space-y-4">
-                        <div className="flex items-center text-[#45474B]">
-                          <div className="flex-shrink-0 w-8 h-8 bg-[#495E57]/10 rounded-lg flex items-center justify-center mr-3">
-                            <MapPin className="text-[#495E57]" size={16} />
-                          </div>
-                          <span className="text-sm font-medium">{camp.location}</span>
+
+                      {/* Fee Pill Badge */}
+                      <div className="absolute top-3 right-3">
+                        <Badge className="bg-[#495E57] dark:bg-[#F4CE14] text-white dark:text-slate-950 text-xs font-black px-3 py-1 rounded-full shadow-xs flex items-center gap-1 border-none">
+                          <FaBangladeshiTakaSign size={11} />
+                          <span>{camp.fees > 0 ? Number(camp.fees).toFixed(0) : 'Free'}</span>
+                        </Badge>
+                      </div>
+
+                      {/* Camp Name Overlay */}
+                      <div className="absolute bottom-3 left-4 right-4">
+                        <h2 className="text-lg font-bold text-white leading-tight drop-shadow-xs line-clamp-1">
+                          {camp.name}
+                        </h2>
+                      </div>
+                    </div>
+
+                    {/* Card Content Details */}
+                    <CardContent className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                      <div className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
+                        <div className="flex items-center gap-2">
+                          <MapPin
+                            size={15}
+                            className="text-[#495E57] dark:text-[#F4CE14] shrink-0"
+                          />
+                          <span className="font-semibold text-slate-800 dark:text-slate-200 truncate">
+                            {camp.location}
+                          </span>
                         </div>
-                        <div className="flex items-center text-[#45474B]">
-                          <div className="flex-shrink-0 w-8 h-8 bg-[#495E57]/10 rounded-lg flex items-center justify-center mr-3">
-                            <Calendar className="text-[#495E57]" size={16} />
-                          </div>
-                          <span className="text-sm">
+
+                        <div className="flex items-center gap-2">
+                          <Calendar
+                            size={15}
+                            className="text-[#495E57] dark:text-[#F4CE14] shrink-0"
+                          />
+                          <span>
                             {new Date(camp.dateTime).toLocaleDateString('en-US', {
                               year: 'numeric',
                               month: 'short',
@@ -222,106 +238,91 @@ const AvailableCamps = () => {
                             })}
                           </span>
                         </div>
-                        <div className="flex items-center text-[#45474B]">
-                          <div className="flex-shrink-0 w-8 h-8 bg-[#F4CE14]/20 rounded-lg flex items-center justify-center mr-3">
-                            <FaBangladeshiTakaSign className="text-[#F4CE14]" size={16} />
-                          </div>
-                          <span className="text-sm font-semibold">${camp.fees.toFixed(2)}</span>
+
+                        <div className="flex items-center gap-2">
+                          <User size={15} className="text-[#495E57] dark:text-[#F4CE14] shrink-0" />
+                          <span className="truncate">{camp.healthcareProfessional}</span>
                         </div>
-                        <div className="flex items-center text-[#45474B]">
-                          <div className="flex-shrink-0 w-8 h-8 bg-[#495E57]/10 rounded-lg flex items-center justify-center mr-3">
-                            <User className="text-[#495E57]" size={16} />
-                          </div>
-                          <span className="text-sm truncate">{camp.healthcareProfessional}</span>
-                        </div>
-                        <div className="flex items-center text-[#45474B]">
-                          <div className="flex-shrink-0 w-8 h-8 bg-[#495E57]/10 rounded-lg flex items-center justify-center mr-3">
-                            <Users className="text-[#495E57]" size={16} />
-                          </div>
-                          <div className="flex-1">
-                            <span className="text-sm font-medium">
-                              {camp.participantCount.toLocaleString()} participants
+
+                        {/* Attendance Progress Gauge */}
+                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                          <div className="flex items-center justify-between text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                            <span className="flex items-center gap-1">
+                              <Users size={13} className="text-[#495E57] dark:text-[#F4CE14]" />
+                              <span>{camp.participantCount} Attended</span>
                             </span>
-                            {/* Progress bar */}
-                            <div className="mt-2 w-full bg-[#F5F7F8] rounded-full h-1.5">
-                              <div
-                                className="bg-[#F4CE14] h-1.5 rounded-full transition-all duration-500"
-                                style={{
-                                  width: `${Math.min((camp.participantCount / 500) * 100, 100)}%`,
-                                }}
-                              />
-                            </div>
+                            <span className="font-mono">{progressPct.toFixed(0)}%</span>
+                          </div>
+                          <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                            <div
+                              className="bg-gradient-to-r from-[#495E57] to-[#F4CE14] h-full rounded-full transition-all duration-500"
+                              style={{ width: `${progressPct}%` }}
+                            />
                           </div>
                         </div>
+                      </div>
+                    </CardContent>
 
-                        {/* Description */}
-                        {camp.description && (
-                          <p className="text-[#45474B]/70 text-sm line-clamp-2">
-                            {camp.description}
-                          </p>
-                        )}
-
-                        <Link
-                          to={`/camp-details/${camp._id}`}
-                          className="mt-4 w-full bg-gradient-to-r from-[#495E57] to-[#495E57]/90 hover:from-[#45474B] hover:to-[#45474B] text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md group/link"
-                        >
-                          View Details
+                    {/* Card Footer Button */}
+                    <CardFooter className="p-6 pt-0">
+                      <Button
+                        asChild
+                        className="w-full bg-[#495E57] dark:bg-[#F4CE14] text-white dark:text-slate-950 font-bold text-xs py-3 px-4 rounded-2xl flex items-center justify-center gap-2 hover:opacity-90 transition cursor-pointer shadow-xs group/btn h-auto border-none"
+                      >
+                        <Link to={`/camp-details/${camp._id}`}>
+                          <span>View Camp Details</span>
                           <ArrowRight
-                            className="ml-2 text-[#F4CE14] group-hover/link:translate-x-1 transition-transform duration-200"
-                            size={16}
+                            size={14}
+                            className="group-hover/btn:translate-x-1 transition-transform"
                           />
                         </Link>
-                      </div>
-                    </div>
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                );
+              })}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between mt-12 pt-6 border-t border-slate-200 dark:border-slate-800">
+                <Button
+                  variant="outline"
+                  onClick={() => setPage((old) => Math.max(old - 1, 1))}
+                  disabled={page === 1}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                >
+                  <ChevronLeft size={16} />
+                  <span>Previous</span>
+                </Button>
+
+                <div className="flex items-center gap-1.5">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                    <Button
+                      key={pageNum}
+                      variant={page === pageNum ? 'default' : 'outline'}
+                      onClick={() => setPage(pageNum)}
+                      className={`w-8 h-8 rounded-xl text-xs font-bold flex items-center justify-center transition cursor-pointer p-0 ${
+                        page === pageNum
+                          ? 'bg-[#495E57] dark:bg-[#F4CE14] text-white dark:text-slate-950 shadow-xs border-none'
+                          : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      {pageNum}
+                    </Button>
                   ))}
                 </div>
 
-                {/* Pagination */}
-                <div className="flex items-center justify-between mt-12">
-                  <button
-                    onClick={() => setPage((old) => Math.max(old - 1, 1))}
-                    disabled={page === 1}
-                    className="flex items-center gap-2 px-4 py-2 border border-[#495E57]/20 rounded-lg hover:bg-[#495E57]/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-[#45474B]"
-                  >
-                    <ChevronLeft size={16} />
-                    Previous
-                  </button>
-                  <div className="flex items-center gap-2">
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      let pageNum;
-                      if (totalPages <= 5) {
-                        pageNum = i + 1;
-                      } else if (page <= 3) {
-                        pageNum = i + 1;
-                      } else if (page >= totalPages - 2) {
-                        pageNum = totalPages - 4 + i;
-                      } else {
-                        pageNum = page - 2 + i;
-                      }
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => setPage(pageNum)}
-                          className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
-                            page === pageNum
-                              ? 'bg-[#495E57] text-white'
-                              : 'text-[#45474B] hover:bg-[#495E57]/10'
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <button
-                    onClick={() => setPage((old) => (old < totalPages ? old + 1 : old))}
-                    disabled={page === totalPages || totalPages === 0}
-                    className="flex items-center gap-2 px-4 py-2 border border-[#495E57]/20 rounded-lg hover:bg-[#495E57]/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-[#45474B]"
-                  >
-                    Next <ChevronRight size={16} />
-                  </button>
-                </div>
-              </>
+                <Button
+                  variant="outline"
+                  onClick={() => setPage((old) => (old < totalPages ? old + 1 : old))}
+                  disabled={page === totalPages || totalPages === 0}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                >
+                  <span>Next</span>
+                  <ChevronRight size={16} />
+                </Button>
+              </div>
             )}
           </>
         )}
