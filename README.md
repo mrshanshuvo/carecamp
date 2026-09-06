@@ -1,74 +1,352 @@
-# Medical Camp Management System (MCMS)
+# CareCamp
 
-**Organizer Username:** shuvo@gmail.com  
-**Organizer Password:** shuvo123  
-**Live Site URL:** (https://mcms-auth.firebaseapp.com/)
-
----
-
-## What is MCMS?
-
-MCMS is a full-stack MERN app designed to make organizing and joining medical camps a breeze for both organizers and participants. Manage camps, register participants, track payments, get feedback, and more — all in one place.
-
----
+A modern React frontend for a medical camp management platform that connects participants and organizers through camp discovery, registration, payments, dashboards, analytics, and feedback.
 
 ## Features
 
-- 🔥 Responsive design for mobile, tablet & desktop — no crappy layouts here.
-- 🚀 Secure authentication with JWT & social logins (Google).
-- 🎯 Organizers can add, update, and delete camps with full CRUD support.
-- 👥 Participant registration modal with real-time participant count updates.
-- 📅 Search, sort, and paginate camps for easy browsing.
-- 📊 Participant dashboard with analytics charts showing their camp history.
-- 💬 Feedback and ratings system from participants, visible on homepage.
-- 💳 Payment integration with Stripe, tracking payment and confirmation statuses.
-- ⚙️ Organizer dashboard to manage camps and registrations with confirmations and cancellations.
-- 🛠️ Sweet alerts/toasts for all CRUD and auth operations — no annoying default alerts.
-- 🛑 404 page for those who wander off the beaten path.
-- 🦾 Environment variables hide all sensitive info like Firebase keys and DB creds.
-- 💻 Persistent login on private routes — no more random redirects to login on reload.
-- 📞 Footer with essential links and contact info for easy access.
+* Browse available medical camps
+* View detailed camp information
+* Register for medical camps
+* Secure authentication with Firebase
+* Email/password and Google authentication
+* Role-based access control
+* Participant dashboard
+* Organizer dashboard
+* Camp management for organizers
+* Camp registration management
+* Stripe payment integration
+* Payment history
+* Participant analytics
+* Organizer analytics
+* Feedback and ratings
+* Search, sorting, and pagination
+* Responsive design
+* Loading states and skeletons
+* Toast and alert notifications
+* SEO-friendly page metadata
+* Protected routes
+* Error boundary handling
 
----
+## User Roles
+
+### Participant
+
+Participants can:
+
+* Browse medical camps
+* View camp details
+* Register for camps
+* Complete payments
+* View registered camps
+* View payment history
+* Track participation analytics
+* Submit feedback and ratings
+* Manage their profile
+
+### Organizer
+
+Organizers can:
+
+* Manage their profile
+* Add medical camps
+* Update and manage camps
+* View registered participants
+* Manage registrations
+* View organizer analytics
+
+## Main Sections
+
+The application includes:
+
+* Home
+* Available Camps
+* Camp Details
+* Success Stories
+* About
+* Blog
+* FAQs
+* Documentation
+* Contact
+* Feedback
+* Privacy Policy
+* Terms & Conditions
+* Authentication
+* Participant Dashboard
+* Organizer Dashboard
 
 ## Tech Stack
 
-- **Frontend:** React, React Router, React Hook Form, TanStack Query, Recharts, Tailwind CSS
-- **Backend:** Node.js, Express, MongoDB, JWT Authentication
-- **Payments:** Stripe
-- **Deployment:** Vercel/Netlify (Your choice)
+### Frontend
 
----
+* React 19
+* Vite
+* JavaScript
+* React Router
+* Tailwind CSS
+* Material UI
+* Radix UI
+* TanStack React Query
+* React Hook Form
+* Axios
+* Recharts
+* React Helmet Async
 
-## Organizer Login Info
+### Authentication
 
-- Username: `shuvo@gmail.com`
-- Password: `shuvo123`
+* Firebase Authentication
+* Email and Password Authentication
+* Google Authentication
 
-_(Make sure to set this user manually in your database as per project requirements.)_
+### Payments
 
----
+* Stripe
+* Stripe React
+* Stripe.js
 
-## Useful Links
+### UI & Utilities
 
-- [Live Site](https://mcms-auth.firebaseapp.com/)
-- [Client GitHub Repo](https://github.com/Programming-Hero-Web-Course4/b11a12-client-side-mrshanshuvo)
-- [Server GitHub Repo](https://github.com/Programming-Hero-Web-Course4/b11a12-server-side-mrshanshuvo)
+* Lucide React
+* Heroicons
+* React Icons
+* React Hot Toast
+* SweetAlert2
+* React Loading Skeleton
+* date-fns
 
----
+### Development Tools
 
-## How to Run Locally
+* ESLint
+* Prettier
+* Husky
+* lint-staged
 
-1. Clone both client and server repos.
-2. Setup `.env` files with your Firebase and MongoDB credentials.
-3. Run `npm install` and `npm start` on both projects.
-4. Use Postman or your browser to test API routes.
+## Application Flow
 
----
+```text
+                    CareCamp
+                       │
+          ┌────────────┴────────────┐
+          │                         │
+      Participant                Organizer
+          │                         │
+   Browse Camps              Manage Camps
+          │                         │
+   View Camp Details          Manage Registrations
+          │                         │
+     Register                   Analytics
+          │
+       Payment
+          │
+   Track Participation
+          │
+   Feedback & Rating
+```
 
-Made with ❤️ by Shuvo  
-If you want to test the Organizer features, use the above credentials.
+## Project Structure
 
----
+```text
+carecamp/
+├── public/
+│   ├── care-camp.png
+│   ├── manifest.json
+│   └── ...
+├── src/
+│   ├── assets/
+│   ├── components/
+│   ├── contexts/
+│   ├── layouts/
+│   ├── pages/
+│   ├── routes/
+│   ├── hooks/
+│   ├── providers/
+│   └── main.jsx
+├── .firebaserc
+├── .gitignore
+├── .husky/
+├── components.json
+├── eslint.config.js
+├── firebase.json
+├── index.html
+├── package.json
+├── vite.config.js
+└── README.md
+```
 
-_Any questions? Hit me up._
+## Getting Started
+
+### Prerequisites
+
+Make sure you have installed:
+
+* Node.js
+* npm
+* Git
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/mrshanshuvo/carecamp.git
+cd carecamp
+```
+
+### Install Dependencies
+
+```bash
+npm install
+```
+
+### Environment Variables
+
+Create a `.env.local` file and configure the required environment variables for:
+
+* Firebase
+* Backend API
+* Stripe
+
+Do not commit sensitive credentials to the repository.
+
+### Run the Development Server
+
+```bash
+npm run dev
+```
+
+The application will be available at:
+
+```text
+http://localhost:5173
+```
+
+## Available Scripts
+
+```bash
+npm run dev
+```
+
+Starts the Vite development server.
+
+```bash
+npm run build
+```
+
+Creates a production build.
+
+```bash
+npm run preview
+```
+
+Previews the production build locally.
+
+```bash
+npm run lint
+```
+
+Checks the project for ESLint issues.
+
+```bash
+npm run lint:fix
+```
+
+Automatically fixes applicable ESLint issues.
+
+```bash
+npm run format
+```
+
+Formats the project using Prettier.
+
+```bash
+npm run format:check
+```
+
+Checks Prettier formatting.
+
+## Authentication
+
+CareCamp uses Firebase Authentication for user authentication.
+
+Supported authentication methods include:
+
+* Email and password
+* Google authentication
+
+Authentication state is managed through the application's authentication context.
+
+Protected routes ensure that authenticated users can access the appropriate application areas.
+
+## Role-Based Access
+
+The application separates access based on user roles.
+
+```text
+Public
+ ├── Home
+ ├── Camps
+ ├── About
+ ├── Blog
+ ├── FAQs
+ └── Contact
+
+Authenticated
+ └── Dashboard
+
+Organizer
+ ├── Organizer Profile
+ ├── Analytics
+ ├── Add Camp
+ ├── Manage Camps
+ └── Manage Registrations
+
+Participant
+ ├── Profile
+ ├── Analytics
+ ├── Registered Camps
+ └── Payment History
+```
+
+## Payment Integration
+
+CareCamp integrates Stripe for online payments.
+
+The payment flow allows participants to complete payments associated with their camp registrations and view their payment history.
+
+## Data Management
+
+TanStack React Query is used for server-state management and API data handling.
+
+Axios is used for HTTP communication with the backend services.
+
+## Responsive Design
+
+CareCamp is designed to provide a consistent experience across:
+
+* Desktop
+* Tablet
+* Mobile devices
+
+The interface uses responsive layouts and reusable components to maintain usability across different screen sizes.
+
+## Code Quality
+
+The project uses:
+
+* ESLint for code quality
+* Prettier for formatting
+* Husky for Git hooks
+* lint-staged for staged-file checks
+
+These tools help maintain consistent and maintainable code.
+
+## Project Status
+
+Active frontend project.
+
+## License
+
+This project is licensed under the MIT License.
+
+## Author
+
+**Shahid Hasan Shuvo**
+
+Full Stack Developer
